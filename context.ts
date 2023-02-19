@@ -1,3 +1,11 @@
-import { ObserverInternals } from "./observer";
+import { Observer } from "./observer";
 
-export const context: ObserverInternals[] = [];
+type Context = {
+  OBSERVER: Observer | undefined;
+  TRACKING: boolean;
+};
+
+export const CONTEXT: Context = {
+  OBSERVER: undefined,
+  TRACKING: false,
+};

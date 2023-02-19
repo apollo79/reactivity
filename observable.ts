@@ -1,9 +1,8 @@
-import { context } from "./context";
-import { ObserverInternals } from "./observer";
+import { Computation } from "./computation";
+import { CONTEXT } from "./context";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T) => T;
-export type Signal<T> = [get: Accessor<T>, set: Setter<T>];
 
 type EqualsFunction<T> = (prev: T, next: T) => boolean;
 type UpdateFunction<T> = (current: T) => T;
@@ -12,8 +11,8 @@ export type ObservableOptions<T> = {
   equals?: false | EqualsFunction<T>;
 };
 
-export class Observable<T> {
-  observers = new Set<ObserverInternals>();
+export class Observable<T = unknown> {
+  observers = new Set<Computation>();
   value: T;
   // the function to compare nextValue to the current value
   equals: EqualsFunction<T>;
@@ -28,21 +27,21 @@ export class Observable<T> {
    * stores dependencies between observables and computations in a double-linked list
    */
   #subscribe = () => {
-    const running = context[context.length - 1];
+    const running = CONTEXT.OBSERVER;
 
-    if (running) {
+    if (CONTEXT.TRACKING && running && running instanceof Computation) {
       this.observers.add(running);
-      running.observables.add(this.observers);
+      running.observables.add(this as Observable<unknown>);
     }
   };
 
-  get = () => {
+  get: Accessor<T> = () => {
     this.#subscribe();
 
     return this.value;
   };
 
-  set = (value: UpdateFunction<T> | T): T => {
+  set: Setter<T> = (value: UpdateFunction<T> | T): T => {
     const nextValue = value instanceof Function ? value(this.value) : value;
 
     if (!this.equals(this.value, nextValue)) {
@@ -56,12 +55,6 @@ export class Observable<T> {
 
     return this.value;
   };
-}
 
-export function createSignal<T>(): Signal<T | undefined>;
-export function createSignal<T>(value: T): Signal<T>;
-export function createSignal<T>(value?: T): Signal<T | undefined> {
-  const { get, set } = new Observable<T | undefined>(value);
-
-  return [get, set];
+  stale = () => {};
 }
