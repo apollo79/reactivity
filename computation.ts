@@ -1,14 +1,13 @@
 import { CONTEXT } from "./context";
 import { Observable, ObservableOptions } from "./observable";
-import { Observer } from "./observer";
 
 export type ComputationFunction<Prev, Next extends Prev = Prev> = (
   prevValue: Prev
 ) => Next;
 
-export class Computation<Init = unknown, Next = unknown> extends Observer {
-  #fn: ComputationFunction<Init | Next, Next>;
-  observables = new Set<Observable<unknown>>();
+export class Computation<Init = unknown, Next = unknown> {
+  fn: ComputationFunction<Init | Next, Next>;
+  observables = new Set<Observable>();
   #prevValue: Observable<Init | Next>;
 
   constructor(
@@ -16,11 +15,18 @@ export class Computation<Init = unknown, Next = unknown> extends Observer {
     init?: Init,
     options?: ObservableOptions<Init | Next>
   ) {
-    super();
-    this.#fn = fn;
+    this.fn = fn;
     this.#prevValue = new Observable<Init | Next>(init!, options);
     this.execute();
   }
+
+  cleanup = () => {
+    this.observables.forEach((observable) => {
+      observable.observers.delete(this as unknown as Computation);
+    });
+
+    this.observables.clear();
+  };
 
   execute = () => {
     if (Object.is(CONTEXT.OBSERVER, this)) {
@@ -36,7 +42,7 @@ export class Computation<Init = unknown, Next = unknown> extends Observer {
     this.cleanup();
 
     try {
-      this.#prevValue.set(this.#fn(this.#prevValue.get()));
+      this.#prevValue.set(this.fn(this.#prevValue.get()));
     } finally {
       CONTEXT.OBSERVER = undefined;
     }
