@@ -19,5 +19,6 @@ export function createEffect<Next, Init>(
   fn: EffectFunction<Init | Next, Next>,
   value?: Init
 ): void {
+  // @ts-ignore this is ok with the overloads but ts doesn't like it
   new Computation(fn, value);
 }

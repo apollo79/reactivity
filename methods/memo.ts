@@ -11,13 +11,14 @@ export function createMemo<Next extends Prev, Init = Next, Prev = Next>(
   options?: ObservableOptions<Next>
 ): Accessor<Next>;
 export function createMemo<Next extends Prev, Init, Prev>(
-  fn: EffectFunction<Init | Prev, Next>,
+  fn: EffectFunction<undefined | Init | Prev, Next>,
   value?: Init,
   options?: ObservableOptions<Next>
 ): Accessor<Next> {
   return new Computation(
     fn,
     value,
-    options as ObservableOptions<Next | Init> | undefined
-  ).prevValue.get as unknown as Accessor<Next>;
+    // @ts-ignore no idea why ts complains, since `Next` is included in `Next | Init | undefined`
+    options
+  ).prevValue.get;
 }

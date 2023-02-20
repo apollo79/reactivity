@@ -14,24 +14,26 @@ export type ComputationFunction<Prev, Next extends Prev = Prev> = (
 ) => Next;
 
 export class Computation<Next, Init = unknown> extends Observer {
-  fn: ComputationFunction<Init | Next, Next>;
-  prevValue: Observable<Next | Init>;
+  fn: ComputationFunction<undefined | Init | Next, Next>;
+  prevValue: Observable<Next>;
   waiting = 0;
   fresh = false;
+  readonly init?: Init | undefined;
 
   constructor(
-    fn: ComputationFunction<Init | Next, Next>,
+    fn: ComputationFunction<undefined | Init | Next, Next>,
     init?: Init,
     options?: ObservableOptions<Next | Init>
   ) {
     super();
     this.fn = fn;
-    this.prevValue = new Observable<Next | Init>(init, options);
-    this.execute();
+    this.init = init;
+    // extra `run` method which doesn't set the internal observable, which isn't created at the time
+    this.prevValue = new Observable(this.run(), options);
   }
 
-  execute = () => {
-    this.waiting = 0;
+  run = (): Next => {
+    // this.waiting = 0;
 
     if (Object.is(CONTEXT.OBSERVER, this)) {
       throw Error("Circular effect execution detected");
@@ -42,6 +44,12 @@ export class Computation<Next, Init = unknown> extends Observer {
     this.parent?.observers.add(this);
 
     return wrapComputation(this.fn, this, true);
+  };
+
+  update = () => {
+    this.waiting = 0;
+
+    return this.prevValue.set(this.run());
   };
 
   stale = (change: Stale, fresh: boolean) => {
@@ -60,7 +68,7 @@ export class Computation<Next, Init = unknown> extends Observer {
     }
 
     if (this.waiting === 0) {
-      this.execute();
+      this.update();
     }
 
     this.prevValue.stale(NON_STALE, false);
