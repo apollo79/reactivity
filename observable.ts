@@ -7,6 +7,10 @@ export type Setter<T> = (nextValue: T) => T;
 type EqualsFunction<T> = (prev: T, next: T) => boolean;
 type UpdateFunction<T> = (current: T) => T;
 
+export type Stale = typeof STALE | typeof NON_STALE;
+export const STALE = 1;
+export const NON_STALE = -1;
+
 export type ObservableOptions<T> = {
   equals?: false | EqualsFunction<T>;
 };
@@ -45,16 +49,24 @@ export class Observable<T = unknown> {
     const nextValue = value instanceof Function ? value(this.value) : value;
 
     if (!this.equals(this.value, nextValue)) {
-      this.value = nextValue;
-      // cloning, so elements inserted while executing do not affect this to run
+      if (CONTEXT.BATCH) {
+        CONTEXT.BATCH.set(this, nextValue);
+      } else {
+        this.value = nextValue;
+        // cloning, so elements inserted while executing do not affect this to run
 
-      for (const computation of [...this.observers]) {
-        computation.execute();
+        this.stale(STALE, true);
+
+        this.stale(NON_STALE, true);
       }
     }
 
     return this.value;
   };
 
-  stale = () => {};
+  stale = (change: Stale, fresh: boolean) => {
+    this.observers.forEach((observer) => {
+      observer.stale(change, fresh);
+    });
+  };
 }
