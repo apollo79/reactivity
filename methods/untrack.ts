@@ -1,11 +1,6 @@
 import { CONTEXT } from "../context";
+import { wrapComputation } from "../utils/wrapComputation";
 
 export function untrack(fn: () => void) {
-  const PREV_TRACKING = CONTEXT.TRACKING;
-
-  CONTEXT.TRACKING = false;
-
-  fn();
-
-  CONTEXT.TRACKING = PREV_TRACKING;
+  return wrapComputation(fn, CONTEXT.OBSERVER, false);
 }

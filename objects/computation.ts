@@ -1,4 +1,5 @@
 import { CONTEXT } from "../context";
+import { wrapComputation } from "../utils/wrapComputation";
 import {
   NON_STALE,
   Observable,
@@ -43,21 +44,9 @@ export class Computation<Next, Init = unknown> {
       throw Error("Circular effect execution detected");
     }
 
-    const PREV_OBSERVER = CONTEXT.OBSERVER;
-    const PREV_TRACKING = CONTEXT.TRACKING;
-
-    CONTEXT.OBSERVER = this;
-    CONTEXT.TRACKING = true;
-
     this.cleanup();
 
-    try {
-      // use value here, as with `get` we would register ourselves as listening to our own signal which would cause an infinite loop
-      this.prevValue.set(this.fn(this.prevValue.value));
-    } finally {
-      CONTEXT.OBSERVER = PREV_OBSERVER;
-      CONTEXT.TRACKING = PREV_TRACKING;
-    }
+    return wrapComputation(this.fn, this, true);
   };
 
   stale = (change: Stale, fresh: boolean) => {
