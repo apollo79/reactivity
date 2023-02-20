@@ -1,5 +1,5 @@
 import { Computation } from "../objects/computation";
-import { EffectFunction } from "./effect";
+import { EffectFunction } from "./createEffect";
 import { Accessor, ObservableOptions } from "../objects/observable";
 
 export function createMemo<Next extends Prev, Prev = Next>(
