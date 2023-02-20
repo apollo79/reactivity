@@ -1,8 +1,8 @@
 import { Observable } from "./objects/observable";
-import { Computation } from "./objects/computation";
+import { Observer } from "./objects/observer";
 
 type Context = {
-  OBSERVER: Computation<any, any> | undefined;
+  OBSERVER: Observer | undefined;
   TRACKING: boolean;
   BATCH: Map<Observable<any>, any> | undefined;
 };

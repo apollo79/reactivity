@@ -7,14 +7,14 @@ import {
   STALE,
   Stale,
 } from "./observable";
+import { Observer } from "./observer";
 
 export type ComputationFunction<Prev, Next extends Prev = Prev> = (
   prevValue: Prev
 ) => Next;
 
-export class Computation<Next, Init = unknown> {
+export class Computation<Next, Init = unknown> extends Observer {
   fn: ComputationFunction<Init | Next, Next>;
-  observables = new Set<Observable<any>>();
   prevValue: Observable<Next | Init>;
   waiting = 0;
   fresh = false;
@@ -24,18 +24,11 @@ export class Computation<Next, Init = unknown> {
     init?: Init,
     options?: ObservableOptions<Next | Init>
   ) {
+    super();
     this.fn = fn;
     this.prevValue = new Observable<Next | Init>(init, options);
     this.execute();
   }
-
-  cleanup = () => {
-    this.observables.forEach((observable) => {
-      observable.observers.delete(this);
-    });
-
-    this.observables.clear();
-  };
 
   execute = () => {
     this.waiting = 0;
@@ -44,7 +37,9 @@ export class Computation<Next, Init = unknown> {
       throw Error("Circular effect execution detected");
     }
 
-    this.cleanup();
+    this.dispose();
+
+    this.parent?.observers.add(this);
 
     return wrapComputation(this.fn, this, true);
   };
