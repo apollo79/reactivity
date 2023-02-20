@@ -1,4 +1,4 @@
-import { CONTEXT } from "./context";
+import { CONTEXT } from "../context";
 import {
   NON_STALE,
   Observable,
@@ -11,26 +11,26 @@ export type ComputationFunction<Prev, Next extends Prev = Prev> = (
   prevValue: Prev
 ) => Next;
 
-export class Computation<Init = unknown, Next = unknown> {
+export class Computation<Next, Init = unknown> {
   fn: ComputationFunction<Init | Next, Next>;
-  observables = new Set<Observable>();
-  prevValue: Observable<Init | Next>;
+  observables = new Set<Observable<any>>();
+  prevValue: Observable<Next | Init>;
   waiting = 0;
   fresh = false;
 
   constructor(
     fn: ComputationFunction<Init | Next, Next>,
     init?: Init,
-    options?: ObservableOptions<Init | Next>
+    options?: ObservableOptions<Next | Init>
   ) {
     this.fn = fn;
-    this.prevValue = new Observable<Init | Next>(init!, options);
+    this.prevValue = new Observable<Next | Init>(init, options);
     this.execute();
   }
 
   cleanup = () => {
     this.observables.forEach((observable) => {
-      observable.observers.delete(this as unknown as Computation);
+      observable.observers.delete(this);
     });
 
     this.observables.clear();

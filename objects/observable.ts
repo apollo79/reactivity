@@ -1,5 +1,5 @@
 import { Computation } from "./computation";
-import { CONTEXT } from "./context";
+import { CONTEXT } from "../context";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T) => T;
@@ -16,7 +16,7 @@ export type ObservableOptions<T> = {
 };
 
 export class Observable<T = unknown> {
-  observers = new Set<Computation>();
+  observers = new Set<Computation<any, any>>();
   value: T;
   // the function to compare nextValue to the current value
   equals: EqualsFunction<T>;

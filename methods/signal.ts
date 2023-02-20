@@ -1,4 +1,9 @@
-import { Accessor, Observable, ObservableOptions, Setter } from "./observable";
+import {
+  Accessor,
+  Observable,
+  ObservableOptions,
+  Setter,
+} from "../objects/observable";
 
 export type SignalOptions<T> = ObservableOptions<T>;
 export class Signal<T> extends Observable<T> {

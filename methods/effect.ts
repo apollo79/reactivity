@@ -1,11 +1,12 @@
-import { Computation, ComputationFunction } from "./computation";
+import { Computation, ComputationFunction } from "../objects/computation";
+import { ObservableOptions } from "../objects/observable";
 
 export type EffectFunction<
   Prev,
   Next extends Prev = Prev
 > = ComputationFunction<Prev, Next>;
 
-export class Effect<Init, Next = unknown> extends Computation<Init, Next> {}
+export type EffectOptions<T> = ObservableOptions<T>;
 
 export function createEffect<Next>(
   fn: EffectFunction<undefined | Next, Next>
@@ -18,5 +19,5 @@ export function createEffect<Next, Init>(
   fn: EffectFunction<Init | Next, Next>,
   value?: Init
 ): void {
-  new Effect(fn, value);
+  new Computation(fn, value);
 }

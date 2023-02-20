@@ -1,4 +1,4 @@
-import { CONTEXT } from "./context";
+import { CONTEXT } from "../context";
 
 export function untrack(fn: () => void) {
   const PREV_TRACKING = CONTEXT.TRACKING;

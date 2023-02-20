@@ -1,5 +1,5 @@
-import { Observable } from "./observable";
-import { Computation } from "./computation";
+import { Observable } from "./objects/observable";
+import { Computation } from "./objects/computation";
 
 type Context = {
   OBSERVER: Computation<any, any> | undefined;
