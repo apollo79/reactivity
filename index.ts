@@ -4,3 +4,4 @@ export { createMemo } from "./methods/memo";
 export { createRoot } from "./methods/root";
 export { untrack } from "./methods/untrack";
 export { batch } from "./methods/batch";
+export { onCleanup } from "./methods/onCleanup";

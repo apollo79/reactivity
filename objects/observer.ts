@@ -1,4 +1,5 @@
 import { CONTEXT } from "../context";
+import { CleanupFunction } from "../methods/onCleanup";
 import { Computation } from "./computation";
 import { Observable } from "./observable";
 
@@ -6,6 +7,7 @@ export class Observer {
   parent: Observer | undefined = CONTEXT.OBSERVER;
   observables = new Set<Observable>();
   observers = new Set<Observer>();
+  cleanups: CleanupFunction[] | null = null;
 
   dispose = () => {
     this.observables.forEach((observable) => {
@@ -19,6 +21,12 @@ export class Observer {
     });
 
     this.observers.clear();
+
+    this.cleanups?.forEach((cleanup) => {
+      cleanup();
+    });
+
+    this.cleanups = null;
 
     this.parent?.observers.delete(this);
   };
