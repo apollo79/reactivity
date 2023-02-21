@@ -7,13 +7,13 @@ import {
   STALE,
   Stale,
 } from "./observable";
-import { Observer } from "./observer";
+import { Owner } from "./owner";
 
 export type ComputationFunction<Prev, Next extends Prev = Prev> = (
   prevValue: Prev
 ) => Next;
 
-export class Computation<Next, Init = unknown> extends Observer {
+export class Computation<Next, Init = unknown> extends Owner {
   fn: ComputationFunction<undefined | Init | Next, Next>;
   prevValue: Observable<Next>;
   waiting = 0;
@@ -35,7 +35,7 @@ export class Computation<Next, Init = unknown> extends Observer {
   run = (): Next => {
     // this.waiting = 0;
 
-    if (Object.is(CONTEXT.OBSERVER, this)) {
+    if (Object.is(CONTEXT.OWNER, this)) {
       throw Error("Circular effect execution detected");
     }
 

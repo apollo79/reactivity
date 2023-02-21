@@ -6,10 +6,10 @@ export function wrapComputation<Next, Init>(
   computation: Computation<Next, Init> | undefined,
   tracking: boolean
 ) {
-  const PREV_OBSERVER = CONTEXT.OBSERVER;
+  const PREV_OBSERVER = CONTEXT.OWNER;
   const PREV_TRACKING = CONTEXT.TRACKING;
 
-  CONTEXT.OBSERVER = computation;
+  CONTEXT.OWNER = computation;
   CONTEXT.TRACKING = tracking;
 
   try {
@@ -17,7 +17,7 @@ export function wrapComputation<Next, Init>(
     // also `prevValue` might be undefined here, since it is set the first time to the result of the `run` method, which calls `wrapComputation`
     return fn(computation?.prevValue?.value ?? computation?.init);
   } finally {
-    CONTEXT.OBSERVER = PREV_OBSERVER;
+    CONTEXT.OWNER = PREV_OBSERVER;
     CONTEXT.TRACKING = PREV_TRACKING;
   }
 }

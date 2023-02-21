@@ -3,10 +3,10 @@ import { CleanupFunction } from "../methods/onCleanup";
 import { Computation } from "./computation";
 import { Observable } from "./observable";
 
-export class Observer {
-  parent: Observer | undefined = CONTEXT.OBSERVER;
+export class Owner {
+  parent: Owner | undefined = CONTEXT.OWNER;
   observables = new Set<Observable>();
-  observers = new Set<Observer>();
+  observers = new Set<Owner>();
   cleanups: CleanupFunction[] | null = null;
 
   dispose = () => {

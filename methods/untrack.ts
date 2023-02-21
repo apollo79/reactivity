@@ -3,8 +3,8 @@ import { Computation } from "../objects/computation";
 import { wrapComputation } from "../utils/wrapComputation";
 
 export function untrack(fn: () => void) {
-  if (CONTEXT.OBSERVER instanceof Computation) {
-    return wrapComputation(fn, CONTEXT.OBSERVER, false);
+  if (CONTEXT.OWNER instanceof Computation) {
+    return wrapComputation(fn, CONTEXT.OWNER, false);
   }
 
   return fn();

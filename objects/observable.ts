@@ -31,7 +31,7 @@ export class Observable<T = unknown> {
    * stores dependencies between observables and computations in a double-linked list
    */
   #subscribe = () => {
-    const running = CONTEXT.OBSERVER;
+    const running = CONTEXT.OWNER;
 
     if (CONTEXT.TRACKING && running && running instanceof Computation) {
       this.observers.add(running);

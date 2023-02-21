@@ -1,9 +1,9 @@
 import { wrapRoot } from "../utils/wrapRoot";
-import { Observer } from "./observer";
+import { Owner } from "./owner";
 
 export type RootFunction<T> = (dispose: () => void) => T;
 
-export class Root<T = unknown> extends Observer {
+export class Root<T = unknown> extends Owner {
   fn: RootFunction<T>;
   constructor(fn: RootFunction<T>) {
     super();
