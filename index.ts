@@ -5,3 +5,5 @@ export { createRoot } from "./methods/createRoot";
 export { untrack } from "./methods/untrack";
 export { batch } from "./methods/batch";
 export { onCleanup } from "./methods/onCleanup";
+export { getOwner } from "./utils/getOwner";
+export { runWithOwner } from "./utils/runWithOwner";

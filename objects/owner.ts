@@ -4,7 +4,7 @@ import { Computation } from "./computation";
 import { Observable } from "./observable";
 
 export class Owner {
-  parent: Owner | undefined = CONTEXT.OWNER;
+  parent: Owner | null = CONTEXT.OWNER;
   observables = new Set<Observable>();
   observers = new Set<Owner>();
   cleanups: CleanupFunction[] | null = null;
