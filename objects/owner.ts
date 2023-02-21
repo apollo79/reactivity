@@ -4,12 +4,13 @@ import { Computation } from "./computation";
 import { Observable } from "./observable";
 
 export class Owner {
-  parent: Owner | null = CONTEXT.OWNER;
+  owner: Owner | null = CONTEXT.OWNER;
   observables = new Set<Observable>();
   observers = new Set<Owner>();
-  cleanups: CleanupFunction[] | null = null;
+  cleanups: CleanupFunction[] = [];
+  contexts: Record<symbol, any> = {};
 
-  dispose = () => {
+  dispose = (): void => {
     this.observables.forEach((observable) => {
       observable.observers.delete(this as unknown as Computation<any, any>);
     });
@@ -26,8 +27,22 @@ export class Owner {
       cleanup();
     });
 
-    this.cleanups = null;
+    this.cleanups = [];
 
-    this.parent?.observers.delete(this);
+    this.contexts = {};
+
+    this.owner?.observers.delete(this);
+  };
+
+  get = <T>(id: symbol): T | undefined => {
+    if (id in this.contexts) {
+      return this.contexts[id];
+    } else {
+      return this.owner?.get(id);
+    }
+  };
+
+  set = (id: symbol, value: any): void => {
+    this.contexts[id] = value;
   };
 }

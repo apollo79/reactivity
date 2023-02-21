@@ -12,3 +12,5 @@ export const CONTEXT: Context = {
   TRACKING: false,
   BATCH: undefined,
 };
+
+export const ERRORHANDLERS_SYMBOL = Symbol("Error");

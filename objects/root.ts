@@ -11,6 +11,6 @@ export class Root<T = unknown> extends Owner {
   }
 
   wrap(): T {
-    return runWithOwner(() => this.fn(this.dispose), this, false);
+    return runWithOwner(() => this.fn(this.dispose), this, false)!;
   }
 }
