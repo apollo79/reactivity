@@ -1,5 +1,5 @@
 import { CONTEXT } from "../context";
-import { wrapComputation } from "../utils/wrapComputation";
+import { runWithOwner } from "../utils/runWithOwner";
 import {
   NON_STALE,
   Observable,
@@ -43,7 +43,11 @@ export class Computation<Next, Init = unknown> extends Owner {
 
     this.parent?.observers.add(this);
 
-    return wrapComputation(this.fn, this, true);
+    return runWithOwner(
+      () => this.fn(this.prevValue?.value || this.init),
+      this,
+      true
+    );
   };
 
   update = () => {

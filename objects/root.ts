@@ -1,4 +1,4 @@
-import { wrapRoot } from "../utils/wrapRoot";
+import { runWithOwner } from "../utils/runWithOwner";
 import { Owner } from "./owner";
 
 export type RootFunction<T> = (dispose: () => void) => T;
@@ -11,6 +11,6 @@ export class Root<T = unknown> extends Owner {
   }
 
   wrap(): T {
-    return wrapRoot(this.fn, this);
+    return runWithOwner(() => this.fn(this.dispose), this, false);
   }
 }
