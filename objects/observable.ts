@@ -16,6 +16,7 @@ export type ObservableOptions<T> = {
 };
 
 export class Observable<T = unknown> {
+  parent?: Computation<T, unknown>;
   observers = new Set<Computation<unknown, unknown>>();
   value: T;
   // the function to compare nextValue to the current value
@@ -34,7 +35,7 @@ export class Observable<T = unknown> {
   #subscribe = () => {
     const running = CONTEXT.OWNER;
 
-    if (CONTEXT.TRACKING && running && running instanceof Computation) {
+    if (CONTEXT.TRACKING && running instanceof Computation) {
       this.observers.add(running);
       running.observables.add(this as Observable<unknown>);
     }
@@ -42,6 +43,10 @@ export class Observable<T = unknown> {
 
   get: Accessor<T> = () => {
     this.#subscribe();
+
+    if (this.parent?.waiting) {
+      this.parent.update();
+    }
 
     return this.value;
   };
@@ -54,7 +59,6 @@ export class Observable<T = unknown> {
         CONTEXT.BATCH.set(this as Observable<unknown>, nextValue);
       } else {
         this.value = nextValue;
-        // cloning, so elements inserted while executing do not affect this to run
 
         this.stale(STALE, true);
 

@@ -13,7 +13,7 @@ export class Owner {
   dispose = (): void => {
     this.observables.forEach((observable) => {
       observable.observers.delete(
-        this as unknown as Computation<unknown, unknown>,
+        this as unknown as Computation<unknown, unknown>
       );
     });
 

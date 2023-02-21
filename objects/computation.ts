@@ -30,6 +30,7 @@ export class Computation<Next, Init = unknown> extends Owner {
     this.init = init;
     // extra `run` method which doesn't set the internal observable, which isn't created at the time
     this.prevValue = new Observable<Next>(this.run(), options);
+    this.prevValue.parent = this as Computation<Next, unknown>;
   }
 
   run = (): Next => {
@@ -44,7 +45,7 @@ export class Computation<Next, Init = unknown> extends Owner {
     this.owner?.observers.add(this);
 
     return runWithOwner(
-      () => this.fn(this.prevValue?.value || this.init),
+      () => this.fn(this.prevValue?.value ?? this.init),
       this,
       true,
     )!;
@@ -73,8 +74,8 @@ export class Computation<Next, Init = unknown> extends Owner {
 
     if (this.waiting === 0) {
       this.update();
-    }
 
-    this.prevValue.stale(NON_STALE, false);
+      this.prevValue.stale(NON_STALE, false);
+    }
   };
 }
