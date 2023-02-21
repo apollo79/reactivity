@@ -8,3 +8,4 @@ export { onCleanup } from "./methods/onCleanup";
 export { onError } from "./methods/onError";
 export { getOwner } from "./utils/getOwner";
 export { runWithOwner } from "./utils/runWithOwner";
+export { on } from "./methods/on";
