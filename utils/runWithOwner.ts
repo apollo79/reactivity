@@ -1,12 +1,12 @@
-import { CONTEXT, ERRORHANDLERS_SYMBOL } from "../context";
-import { ErrorFunction } from "../methods/onError";
-import { Owner } from "../objects/owner";
-import { castError } from "./castError";
+import { CONTEXT, ERRORHANDLERS_SYMBOL } from "../context.ts";
+import { ErrorFunction } from "../methods/onError.ts";
+import { Owner } from "../objects/owner.ts";
+import { castError } from "./castError.ts";
 
 export function runWithOwner<T>(
   fn: () => T,
   owner: Owner,
-  tracking: boolean
+  tracking: boolean,
 ): T | undefined {
   const PREV_OBSERVER = CONTEXT.OWNER;
   const PREV_TRACKING = CONTEXT.TRACKING;
@@ -19,8 +19,9 @@ export function runWithOwner<T>(
   } catch (e) {
     const error = castError(e);
 
-    const errorHandlers =
-      CONTEXT.OWNER.get<ErrorFunction[]>(ERRORHANDLERS_SYMBOL);
+    const errorHandlers = CONTEXT.OWNER.get<ErrorFunction[]>(
+      ERRORHANDLERS_SYMBOL,
+    );
 
     if (errorHandlers !== undefined) {
       errorHandlers.forEach((errorHandler) => {

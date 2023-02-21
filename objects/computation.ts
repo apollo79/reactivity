@@ -1,16 +1,16 @@
-import { CONTEXT } from "../context";
-import { runWithOwner } from "../utils/runWithOwner";
+import { CONTEXT } from "../context.ts";
+import { runWithOwner } from "../utils/runWithOwner.ts";
 import {
   NON_STALE,
   Observable,
   ObservableOptions,
   STALE,
   Stale,
-} from "./observable";
-import { Owner } from "./owner";
+} from "./observable.ts";
+import { Owner } from "./owner.ts";
 
 export type ComputationFunction<Prev, Next extends Prev = Prev> = (
-  prevValue: Prev
+  prevValue: Prev,
 ) => Next;
 
 export class Computation<Next, Init = unknown> extends Owner {
@@ -23,7 +23,7 @@ export class Computation<Next, Init = unknown> extends Owner {
   constructor(
     fn: ComputationFunction<undefined | Init | Next, Next>,
     init?: Init,
-    options?: ObservableOptions<Next | Init>
+    options?: ObservableOptions<Next | Init>,
   ) {
     super();
     this.fn = fn;
@@ -46,7 +46,7 @@ export class Computation<Next, Init = unknown> extends Owner {
     return runWithOwner(
       () => this.fn(this.prevValue?.value || this.init),
       this,
-      true
+      true,
     )!;
   };
 

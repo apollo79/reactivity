@@ -1,10 +1,10 @@
-import { Observable } from "./objects/observable";
-import { Owner } from "./objects/owner";
+import { Observable } from "./objects/observable.ts";
+import { Owner } from "./objects/owner.ts";
 
 type Context = {
   OWNER: Owner | null;
   TRACKING: boolean;
-  BATCH: Map<Observable<any>, any> | undefined;
+  BATCH: Map<Observable<unknown>, unknown> | undefined;
 };
 
 export const CONTEXT: Context = {

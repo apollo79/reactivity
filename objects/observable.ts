@@ -1,5 +1,5 @@
-import { Computation } from "./computation";
-import { CONTEXT } from "../context";
+import { Computation } from "./computation.ts";
+import { CONTEXT } from "../context.ts";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T) => T;
@@ -16,15 +16,16 @@ export type ObservableOptions<T> = {
 };
 
 export class Observable<T = unknown> {
-  observers = new Set<Computation<any, any>>();
+  observers = new Set<Computation<unknown, unknown>>();
   value: T;
   // the function to compare nextValue to the current value
   equals: EqualsFunction<T>;
 
   constructor(value?: T, options?: ObservableOptions<T>) {
     this.value = value!;
-    this.equals =
-      options?.equals === false ? () => false : options?.equals || Object.is;
+    this.equals = options?.equals === false
+      ? () => false
+      : options?.equals || Object.is;
   }
 
   /**
@@ -50,7 +51,7 @@ export class Observable<T = unknown> {
 
     if (!this.equals(this.value, nextValue)) {
       if (CONTEXT.BATCH) {
-        CONTEXT.BATCH.set(this, nextValue);
+        CONTEXT.BATCH.set(this as Observable<unknown>, nextValue);
       } else {
         this.value = nextValue;
         // cloning, so elements inserted while executing do not affect this to run

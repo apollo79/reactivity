@@ -1,5 +1,5 @@
-import { runWithOwner } from "../utils/runWithOwner";
-import { Owner } from "./owner";
+import { runWithOwner } from "../utils/runWithOwner.ts";
+import { Owner } from "./owner.ts";
 
 export type RootFunction<T> = (dispose: () => void) => T;
 

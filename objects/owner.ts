@@ -1,18 +1,20 @@
-import { CONTEXT } from "../context";
-import { CleanupFunction } from "../methods/onCleanup";
-import { Computation } from "./computation";
-import { Observable } from "./observable";
+import { CONTEXT } from "../context.ts";
+import { CleanupFunction } from "../methods/onCleanup.ts";
+import { Computation } from "./computation.ts";
+import { Observable } from "./observable.ts";
 
 export class Owner {
   owner: Owner | null = CONTEXT.OWNER;
   observables = new Set<Observable>();
   observers = new Set<Owner>();
   cleanups: CleanupFunction[] = [];
-  contexts: Record<symbol, any> = {};
+  contexts: Record<symbol, unknown> = {};
 
   dispose = (): void => {
     this.observables.forEach((observable) => {
-      observable.observers.delete(this as unknown as Computation<any, any>);
+      observable.observers.delete(
+        this as unknown as Computation<unknown, unknown>,
+      );
     });
 
     this.observables.clear();
@@ -36,13 +38,13 @@ export class Owner {
 
   get = <T>(id: symbol): T | undefined => {
     if (id in this.contexts) {
-      return this.contexts[id];
+      return this.contexts[id] as T;
     } else {
       return this.owner?.get(id);
     }
   };
 
-  set = (id: symbol, value: any): void => {
+  set = (id: symbol, value: unknown): void => {
     this.contexts[id] = value;
   };
 }

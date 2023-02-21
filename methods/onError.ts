@@ -1,4 +1,4 @@
-import { CONTEXT, ERRORHANDLERS_SYMBOL } from "../context";
+import { CONTEXT, ERRORHANDLERS_SYMBOL } from "../context.ts";
 
 export type ErrorFunction = (error: Error) => void;
 
@@ -8,6 +8,8 @@ export function onError(handler: ErrorFunction) {
   if (!(ERRORHANDLERS_SYMBOL in CONTEXT.OWNER)) {
     CONTEXT.OWNER.contexts[ERRORHANDLERS_SYMBOL] = [handler];
   } else {
-    CONTEXT.OWNER.contexts[ERRORHANDLERS_SYMBOL].push(handler);
+    (CONTEXT.OWNER.contexts[ERRORHANDLERS_SYMBOL] as ErrorFunction[]).push(
+      handler,
+    );
   }
 }

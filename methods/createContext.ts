@@ -1,4 +1,4 @@
-import { CONTEXT } from "../context";
+import { CONTEXT } from "../context.ts";
 
 export type Context<T> = {
   id: symbol;

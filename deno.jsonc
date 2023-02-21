@@ -1,0 +1,13 @@
+{
+  "fmt": {
+    "options": {
+      "indentWidth": 2
+    }
+  },
+  "tasks": {
+    "test": "deno test --coverage=cov_profile",
+    "coverage": "deno coverage cov_profile",
+    "test:coverage": "deno task test && deno task coverage",
+    "test:cov": "deno task test:coverage"
+  }
+}
