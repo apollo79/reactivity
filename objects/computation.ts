@@ -54,6 +54,8 @@ export class Computation<Next, Init = unknown> extends Owner {
   update = () => {
     this.waiting = 0;
 
+    this.fresh = false;
+
     return this.prevValue.set(this.run());
   };
 
@@ -73,7 +75,9 @@ export class Computation<Next, Init = unknown> extends Owner {
     }
 
     if (this.waiting === 0) {
-      this.update();
+      if (this.fresh) {
+        this.update();
+      }
 
       this.prevValue.stale(NON_STALE, false);
     }
