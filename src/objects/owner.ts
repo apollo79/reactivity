@@ -1,7 +1,7 @@
-import { CONTEXT } from "../context.ts";
-import { CleanupFunction } from "../methods/onCleanup.ts";
-import { Computation } from "./computation.ts";
-import { Observable } from "./observable.ts";
+import { CONTEXT } from "~/context.ts";
+import type { CleanupFunction } from "~/methods/onCleanup.ts";
+import type { Computation } from "~/objects/computation.ts";
+import type { Observable } from "~/objects/observable.ts";
 
 export class Owner {
   owner: Owner | null = CONTEXT.OWNER;
@@ -13,7 +13,7 @@ export class Owner {
   dispose = (): void => {
     this.observables.forEach((observable) => {
       observable.observers.delete(
-        this as unknown as Computation<unknown, unknown>
+        this as unknown as Computation<unknown, unknown>,
       );
     });
 

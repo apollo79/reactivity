@@ -1,5 +1,8 @@
-import { Computation, ComputationFunction } from "../objects/computation.ts";
-import { ObservableOptions } from "../objects/observable.ts";
+import {
+  Computation,
+  type ComputationFunction,
+} from "~/objects/computation.ts";
+import type { ObservableOptions } from "~/objects/observable.ts";
 
 export type EffectFunction<
   Prev,

@@ -1,13 +1,13 @@
-import { CONTEXT } from "../context.ts";
-import { runWithOwner } from "../utils/runWithOwner.ts";
+import { CONTEXT } from "~/context.ts";
+import { runWithOwner } from "~/utils/runWithOwner.ts";
 import {
   NON_STALE,
   Observable,
-  ObservableOptions,
+  type ObservableOptions,
   STALE,
-  Stale,
-} from "./observable.ts";
-import { Owner } from "./owner.ts";
+  type Stale,
+} from "~/objects/observable.ts";
+import { Owner } from "~/objects/owner.ts";
 
 export type ComputationFunction<Prev, Next extends Prev = Prev> = (
   prevValue: Prev,

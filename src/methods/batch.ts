@@ -1,5 +1,5 @@
-import { CONTEXT } from "../context.ts";
-import { NON_STALE, STALE } from "../objects/observable.ts";
+import { CONTEXT } from "~/context.ts";
+import { NON_STALE, STALE } from "~/objects/observable.ts";
 
 export function batch(fn: () => void) {
   // if already batching, do nothing, as batching again would result in BATCH being undefined in the outer batch

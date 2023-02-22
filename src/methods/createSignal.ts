@@ -1,9 +1,9 @@
-import {
+import type {
   Accessor,
-  Observable,
   ObservableOptions,
   Setter,
-} from "../objects/observable.ts";
+} from "~/objects/observable.ts";
+import { Observable } from "~/objects/observable.ts";
 
 export type SignalOptions<T> = ObservableOptions<T>;
 

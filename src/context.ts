@@ -1,5 +1,5 @@
-import { Observable } from "./objects/observable.ts";
-import { Owner } from "./objects/owner.ts";
+import type { Observable } from "~/objects/observable.ts";
+import type { Owner } from "~/objects/owner.ts";
 
 type Context = {
   OWNER: Owner | null;

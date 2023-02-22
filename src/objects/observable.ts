@@ -1,5 +1,5 @@
-import { Computation } from "./computation.ts";
-import { CONTEXT } from "../context.ts";
+import { Computation } from "~/objects/computation.ts";
+import { CONTEXT } from "~/context.ts";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T) => T;

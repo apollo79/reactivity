@@ -1,6 +1,6 @@
-import { Computation } from "../objects/computation.ts";
-import { EffectFunction } from "./createEffect.ts";
-import { Accessor, ObservableOptions } from "../objects/observable.ts";
+import { Computation } from "~/objects/computation.ts";
+import type { EffectFunction } from "~/methods/createEffect.ts";
+import type { Accessor, ObservableOptions } from "~/objects/observable.ts";
 
 export function createMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | Prev, Next>,

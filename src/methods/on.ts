@@ -1,6 +1,6 @@
-import { Accessor } from "../objects/observable.ts";
-import { EffectFunction } from "./createEffect.ts";
-import { untrack } from "./untrack.ts";
+import type { Accessor } from "~/objects/observable.ts";
+import type { EffectFunction } from "~/methods/createEffect.ts";
+import { untrack } from "~/methods/untrack.ts";
 
 // transforms a tuple to a tuple of accessors in a way that allows generics to be inferred
 export type AccessorArray<T> = [

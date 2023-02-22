@@ -1,4 +1,4 @@
-import { CONTEXT, ERRORHANDLERS_SYMBOL } from "../context.ts";
+import { CONTEXT, ERRORHANDLERS_SYMBOL } from "~/context.ts";
 
 export type ErrorFunction = (error: Error) => void;
 

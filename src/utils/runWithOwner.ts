@@ -1,7 +1,7 @@
-import { CONTEXT, ERRORHANDLERS_SYMBOL } from "../context.ts";
-import { ErrorFunction } from "../methods/onError.ts";
-import { Owner } from "../objects/owner.ts";
-import { castError } from "./castError.ts";
+import { CONTEXT, ERRORHANDLERS_SYMBOL } from "~/context.ts";
+import type { ErrorFunction } from "~/methods/onError.ts";
+import type { Owner } from "~/objects/owner.ts";
+import { castError } from "~/utils/castError.ts";
 
 export function runWithOwner<T>(
   fn: () => T,
