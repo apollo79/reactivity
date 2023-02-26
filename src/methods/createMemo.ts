@@ -1,4 +1,4 @@
-import { Computation } from "~/objects/computation.ts";
+import { Computation, ComputationOptions } from "~/objects/computation.ts";
 import type { EffectFunction } from "~/methods/createEffect.ts";
 import type { Accessor, ObservableOptions } from "~/objects/observable.ts";
 
@@ -15,10 +15,14 @@ export function createMemo<Next extends Prev, Init, Prev>(
   value?: Init,
   options?: ObservableOptions<Next>,
 ): Accessor<Next> {
+  const memoOptions: ComputationOptions<Next> = Object.assign(options ?? {}, {
+    isMemo: true,
+  });
+
   return new Computation(
     fn,
     value,
     // @ts-ignore no idea why ts complains, since `Next` is included in `Next | Init | undefined`
-    options,
+    memoOptions,
   ).prevValue.get;
 }
