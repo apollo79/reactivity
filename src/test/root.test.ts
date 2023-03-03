@@ -6,7 +6,7 @@ import {
   createSignal,
   getScope,
   type Memo,
-  onCleanup,
+  onDispose,
   type Signal,
   tick,
 } from "#/mod.ts";
@@ -122,7 +122,7 @@ describe("root", () => {
 
   it("should not throw if dispose called during active disposal process", () => {
     createRoot((dispose) => {
-      onCleanup(() => {
+      onDispose(() => {
         dispose();
       });
 

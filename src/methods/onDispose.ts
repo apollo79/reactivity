@@ -2,7 +2,7 @@ import { CONTEXT } from "~/context.ts";
 
 export type CleanupFunction = () => void;
 
-export function onCleanup(fn: CleanupFunction) {
+export function onDispose(fn: CleanupFunction) {
   if (!CONTEXT.CURRENTSCOPE) {
     return () => {};
   }

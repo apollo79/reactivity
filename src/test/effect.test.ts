@@ -2,7 +2,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  onCleanup,
+  onDispose,
   tick,
 } from "#/mod.ts";
 import {
@@ -69,7 +69,7 @@ describe("effect", () => {
       createEffect(() => {
         $b();
         innerEffect();
-        onCleanup(innerDispose);
+        onDispose(innerDispose);
       });
     });
 
@@ -152,11 +152,11 @@ describe("effect", () => {
     const disposeB = spy();
 
     function fnA() {
-      onCleanup(disposeA);
+      onDispose(disposeA);
     }
 
     function fnB() {
-      onCleanup(disposeB);
+      onDispose(disposeB);
     }
 
     const $a = createSignal(0);
@@ -238,13 +238,13 @@ describe("effect", () => {
 
     function fnA() {
       createEffect(() => {
-        onCleanup(disposeA);
+        onDispose(disposeA);
       });
     }
 
     function fnB() {
       createEffect(() => {
-        onCleanup(disposeB);
+        onDispose(disposeB);
       });
     }
 

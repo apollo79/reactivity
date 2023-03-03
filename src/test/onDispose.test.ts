@@ -1,4 +1,4 @@
-import { createEffect, createRoot, onCleanup, tick } from "#/mod.ts";
+import { createEffect, createRoot, onDispose, tick } from "#/mod.ts";
 import { assertSpyCalls, describe, it, spy } from "./util.ts";
 describe("onCleanup", () => {
   it("should be invoked when computation is disposed", () => {
@@ -7,9 +7,9 @@ describe("onCleanup", () => {
     const callback3 = spy();
 
     const stop = createEffect(() => {
-      onCleanup(callback1);
-      onCleanup(callback2);
-      onCleanup(callback3);
+      onDispose(callback1);
+      onDispose(callback2);
+      onDispose(callback3);
     });
 
     stop();
@@ -23,7 +23,7 @@ describe("onCleanup", () => {
     const dispose = spy();
 
     const stop = createEffect(() => {
-      const early = onCleanup(dispose);
+      const early = onDispose(dispose);
       early();
     });
 
@@ -42,7 +42,7 @@ describe("onCleanup", () => {
 
     createRoot(() => {
       createEffect(() => {
-        onCleanup(dispose);
+        onDispose(dispose);
       });
 
       const stop = createEffect(() => {});

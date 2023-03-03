@@ -1,5 +1,5 @@
 import { CacheState, CONTEXT, STATE_DIRTY, STATE_DISPOSED } from "~/context.ts";
-import type { CleanupFunction } from "~/methods/onCleanup.ts";
+import type { CleanupFunction } from "~/methods/onDispose.ts";
 import type { Computation } from "~/objects/computation.ts";
 import type { Observable } from "~/objects/observable.ts";
 

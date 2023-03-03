@@ -6,7 +6,7 @@ export { createRoot } from "~/methods/createRoot.ts";
 export { getContext } from "~/methods/getContext.ts";
 export { setContext } from "~/methods/setContext.ts";
 export { untrack } from "~/methods/untrack.ts";
-export { onCleanup } from "~/methods/onCleanup.ts";
+export { onDispose } from "~/methods/onDispose.ts";
 export { onError } from "~/methods/onError.ts";
 export { getScope } from "~/utils/getScope.ts";
 export { runWithScope } from "~/utils/runWithScope.ts";
