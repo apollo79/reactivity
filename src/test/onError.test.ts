@@ -3,10 +3,10 @@ import {
   createMemo,
   createRoot,
   createSignal,
+  type Memo,
   onError,
   tick,
 } from "#/mod.ts";
-import { Memo } from "../methods/createMemo.ts";
 
 import { assertStrictEquals, assertThrows, describe, it } from "./util.ts";
 

@@ -1,3 +1,5 @@
+import { Accessor } from "~/objects/observable.ts";
+
 export { createSignal } from "~/methods/createSignal.ts";
 export { createEffect } from "~/methods/createEffect.ts";
 export { on } from "~/methods/on.ts";
@@ -13,7 +15,7 @@ export { runWithScope } from "~/utils/runWithScope.ts";
 export { tick } from "~/methods/tick.ts";
 export type { Scope } from "~/objects/scope.ts";
 export type { Signal, SignalOptions } from "~/methods/createSignal.ts";
-export type { Memo } from "~/methods/createMemo.ts";
 export type { EffectFunction, EffectOptions } from "~/methods/createEffect.ts";
 export type { Accessor, Setter } from "~/objects/observable.ts";
 export type { Computation } from "~/objects/computation.ts";
+export type Memo<T> = Accessor<T>;

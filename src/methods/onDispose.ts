@@ -16,7 +16,6 @@ export function onDispose(fn: CleanupFunction) {
     //   return;
     // }
 
-    // fn.call(null)
     fn();
 
     owner.cleanups.splice(owner.cleanups.indexOf(fn), 1);

@@ -1,6 +1,7 @@
 import type { Accessor } from "~/objects/observable.ts";
 import type { EffectFunction } from "~/methods/createEffect.ts";
 import { untrack } from "~/methods/untrack.ts";
+import { NoInfer } from "../context.ts";
 
 // transforms a tuple to a tuple of accessors in a way that allows generics to be inferred
 export type AccessorArray<T> = [
@@ -17,22 +18,22 @@ export type OnOptions = { defer: boolean };
 
 export function on<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
-  fn: OnEffectFunction<S, undefined | Prev, Next>,
+  fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
   options?: OnOptions & { defer?: false },
-): EffectFunction<undefined | Next, Next>;
+): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
 export function on<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
-  fn: OnEffectFunction<S, undefined | Prev, Next>,
+  fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
   options: OnOptions & { defer: true },
-): EffectFunction<undefined | Next>;
+): EffectFunction<undefined | NoInfer<Next>>;
 export function on<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
-  fn: OnEffectFunction<S, undefined | Prev, Next>,
+  fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
   options?: OnOptions,
-): EffectFunction<undefined | Next> {
+): EffectFunction<undefined | NoInfer<Next>> {
   const isArray = Array.isArray(deps);
 
-  let defer = options?.defer;
+  let defer = options?.defer ?? false;
   let prevInput: S;
 
   return (prevValue) => {
@@ -49,7 +50,8 @@ export function on<S, Next extends Prev, Prev = Next>(
     }
 
     if (defer) {
-      defer = true;
+      defer = false;
+
       return undefined;
     }
 

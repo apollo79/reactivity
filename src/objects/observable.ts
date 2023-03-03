@@ -5,6 +5,7 @@ import {
   STATE_CLEAN,
   STATE_DIRTY,
 } from "~/context.ts";
+import { Memo } from "./memo.ts";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T | UpdateFunction<T>) => T;
@@ -17,7 +18,7 @@ export type ObservableOptions<T> = {
 };
 
 export class Observable<T = unknown> {
-  parent?: Computation<T, unknown>;
+  parent?: Memo<T, unknown>;
   observers = new Set<Computation<unknown, unknown>>();
   value: T;
   // the function to compare nextValue to the current value

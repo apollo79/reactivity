@@ -1,6 +1,7 @@
 import { createEffect, createRoot, onDispose, tick } from "#/mod.ts";
 import { assertSpyCalls, describe, it, spy } from "./util.ts";
-describe("onCleanup", () => {
+
+describe("onDispose", () => {
   it("should be invoked when computation is disposed", () => {
     const callback1 = spy();
     const callback2 = spy();
@@ -27,9 +28,9 @@ describe("onCleanup", () => {
       early();
     });
 
-    console.log("after createEffect");
-
     assertSpyCalls(dispose, 1);
+
+    console.log("stopping");
 
     stop();
     tick();

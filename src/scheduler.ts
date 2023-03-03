@@ -1,4 +1,4 @@
-import { Computation } from "./objects/computation.ts";
+import { Effect } from "./objects/effect.ts";
 
 export function runEffects() {
   if (EFFECT_QUEUE.length !== 0) {
@@ -25,4 +25,4 @@ export function flushEffects() {
 export let SCHEDULED_EFFECTS = false;
 export let RUNNING_EFFECTS = false;
 
-export let EFFECT_QUEUE: Computation<unknown, unknown>[] = [];
+export let EFFECT_QUEUE: Effect<unknown, unknown>[] = [];

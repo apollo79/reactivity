@@ -22,3 +22,9 @@ export type CacheState =
   | typeof STATE_DISPOSED;
 
 export const ERRORHANDLERS_SYMBOL = Symbol("Error");
+
+// Magic type that when used at sites where generic types are inferred from, will prevent those sites from being involved in the inference.
+// https://github.com/microsoft/TypeScript/issues/14829
+// TypeScript Discord conversation: https://discord.com/channels/508357248330760243/508357248330760249/911266491024949328
+// deno-lint-ignore no-explicit-any
+export type NoInfer<T extends any> = [T][T extends any ? 0 : never];
