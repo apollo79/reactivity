@@ -1,12 +1,12 @@
 import {
-  CACHE_CHECK,
-  CACHE_CLEAN,
-  CACHE_DIRTY,
   CacheState,
   CONTEXT,
+  STATE_CHECK,
+  STATE_CLEAN,
+  STATE_DIRTY,
 } from "~/context.ts";
-import { runWithOwner } from "~/utils/runWithOwner.ts";
-import { Owner } from "~/objects/owner.ts";
+import { runWithScope } from "~/utils/runWithScope.ts";
+import { Scope } from "~/objects/scope.ts";
 import { Observable, ObservableOptions } from "./observable.ts";
 import { EFFECT_QUEUE, flushEffects, SCHEDULED_EFFECTS } from "../scheduler.ts";
 
@@ -18,12 +18,11 @@ export type ComputationOptions<T> = ObservableOptions<T> & {
   isMemo?: boolean;
 };
 
-export class Computation<Next, Init = unknown> extends Owner {
+export class Computation<Next, Init = unknown> extends Scope {
   fn: ComputationFunction<undefined | Init | Next, Next>;
   prevValue: Observable<Next>;
   readonly init?: Init | undefined;
   isMemo: boolean;
-  state: CacheState;
 
   constructor(
     fn: ComputationFunction<undefined | Init | Next, Next>,
@@ -40,44 +39,44 @@ export class Computation<Next, Init = unknown> extends Owner {
       options,
     );
 
-    this.state = this.isMemo ? CACHE_DIRTY : CACHE_CLEAN;
-
     if (this.isMemo) {
       this.prevValue.parent = this as Computation<Next, unknown>;
+    } else {
+      this.state = STATE_CLEAN;
     }
-
-    new Set();
   }
 
-  run = (): Next => {
-    if (Object.is(CONTEXT.OWNER, this)) {
+  run(): Next {
+    if (Object.is(CONTEXT.CURRENTSCOPE, this)) {
       throw Error("Circular effect execution detected");
     }
 
     this.dispose();
 
-    this.owner?.observers.add(this);
+    this.parentScope?.childrenObservers.add(this);
 
-    return runWithOwner(
+    const result = runWithScope(
       () => this.fn(this.prevValue?.value ?? this.init),
       this,
       true,
     )!;
-  };
 
-  update = () => {
-    this.state = CACHE_CLEAN;
+    this.state = STATE_CLEAN;
 
-    // if (!this.isZombie()) {
-    return this.prevValue.set(this.run());
-    // }
-  };
+    return result;
+  }
 
-  updateIfNecessary = () => {
-    if (this.state === CACHE_CHECK) {
+  update() {
+    if (!this.isZombie()) {
+      return this.prevValue.set(this.run());
+    }
+  }
+
+  updateIfNecessary() {
+    if (this.state === STATE_CHECK) {
       for (const observable of this.observables) {
         observable.parent?.updateIfNecessary();
-        if ((this.state as number) === CACHE_DIRTY) {
+        if ((this.state as number) === STATE_DIRTY) {
           // Stop the loop here so we won't trigger updates on other parents unnecessarily
           // If our computation changes to no longer use some sources, we don't
           // want to update() a source we used last time, but now don't use.
@@ -86,19 +85,19 @@ export class Computation<Next, Init = unknown> extends Owner {
       }
     }
 
-    if (this.state === CACHE_DIRTY) {
+    if (this.state === STATE_DIRTY) {
       this.update();
     }
 
-    this.state = CACHE_CLEAN;
-  };
+    this.state = STATE_CLEAN;
+  }
 
-  stale = (change: CacheState) => {
+  stale(change: CacheState) {
     if (this.state >= change) {
       return;
     }
 
-    if (this.state === CACHE_CLEAN) {
+    if (this.state === STATE_CLEAN) {
       EFFECT_QUEUE.push(this as Computation<unknown, unknown>);
 
       if (!SCHEDULED_EFFECTS) {
@@ -108,6 +107,20 @@ export class Computation<Next, Init = unknown> extends Owner {
 
     this.state = change;
 
-    this.prevValue?.stale(CACHE_CHECK);
-  };
+    this.prevValue?.stale(STATE_CHECK);
+  }
+
+  isZombie() {
+    let owner: Scope | null = this.parentScope;
+
+    while (owner !== null) {
+      if (owner instanceof Computation && owner.state === STATE_DIRTY) {
+        return true;
+      }
+
+      owner = owner.parentScope;
+    }
+
+    return false;
+  }
 }

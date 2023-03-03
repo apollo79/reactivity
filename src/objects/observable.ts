@@ -1,9 +1,9 @@
 import { Computation } from "~/objects/computation.ts";
 import {
-  CACHE_CLEAN,
-  CACHE_DIRTY,
   type CacheState,
   CONTEXT,
+  STATE_CLEAN,
+  STATE_DIRTY,
 } from "~/context.ts";
 
 export type Accessor<T> = () => T;
@@ -22,7 +22,7 @@ export class Observable<T = unknown> {
   value: T;
   // the function to compare nextValue to the current value
   equals: EqualsFunction<T>;
-  state: CacheState = CACHE_CLEAN;
+  state: CacheState = STATE_CLEAN;
 
   constructor(value?: T, options?: ObservableOptions<T>) {
     this.value = value!;
@@ -34,48 +34,40 @@ export class Observable<T = unknown> {
   /**
    * stores dependencies between observables and computations in a double-linked list
    */
-  #subscribe = () => {
-    const running = CONTEXT.OWNER;
+  #subscribe() {
+    const running = CONTEXT.CURRENTSCOPE;
 
     if (CONTEXT.TRACKING && running instanceof Computation) {
       this.observers.add(running);
       running.observables.add(this as Observable<unknown>);
     }
-  };
+  }
 
-  get: Accessor<T> = () => {
+  get(): T {
     this.#subscribe();
 
     this.parent?.updateIfNecessary();
 
-    // this.parent?.updateIfNecessary();
-
     return this.value;
-  };
+  }
 
-  set: Setter<T> = (value) => {
+  set(value: T | UpdateFunction<T>): T {
     const nextValue = value instanceof Function ? value(this.value) : value;
 
     if (!this.equals(this.value, nextValue)) {
-      if (CONTEXT.BATCH) {
-        CONTEXT.BATCH.set(this as Observable<unknown>, nextValue);
-      } else {
-        this.value = nextValue;
+      this.value = nextValue;
 
-        this.stale(CACHE_DIRTY);
-
-        // this.stale(NON_STALE, true);
-      }
+      this.stale(STATE_DIRTY);
     }
 
     return this.value;
-  };
+  }
 
-  stale = (change: CacheState): void => {
+  stale(change: CacheState): void {
     this.state = change;
 
     this.observers.forEach((observer) => {
       observer.stale(change);
     });
-  };
+  }
 }

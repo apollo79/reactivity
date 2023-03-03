@@ -13,15 +13,17 @@ export type EffectOptions<T> = ObservableOptions<T>;
 
 export function createEffect<Next>(
   fn: EffectFunction<undefined | Next, Next>,
-): void;
+): () => void;
 export function createEffect<Next, Init = Next>(
   fn: EffectFunction<Init | Next, Next>,
   value: Init,
-): void;
+): () => void;
 export function createEffect<Next, Init>(
   fn: EffectFunction<Init | Next, Next>,
   value?: Init,
-): void {
+): () => void {
   // @ts-ignore this is ok with the overloads but ts doesn't like it
-  new Computation(fn, value);
+  const computation = new Computation(fn, value);
+
+  return computation.dispose.bind(computation);
 }

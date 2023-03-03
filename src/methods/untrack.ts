@@ -1,10 +1,10 @@
 import { CONTEXT } from "~/context.ts";
 import { Computation } from "~/objects/computation.ts";
-import { runWithOwner } from "~/utils/runWithOwner.ts";
+import { runWithScope } from "~/utils/runWithScope.ts";
 
 export function untrack<T>(fn: () => T): T {
-  if (CONTEXT.OWNER instanceof Computation) {
-    return runWithOwner(fn, CONTEXT.OWNER, false)!;
+  if (CONTEXT.CURRENTSCOPE instanceof Computation) {
+    return runWithScope(fn, CONTEXT.CURRENTSCOPE, false)!;
   }
 
   return fn();

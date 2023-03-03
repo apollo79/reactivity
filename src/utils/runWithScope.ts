@@ -1,17 +1,17 @@
 import { CONTEXT, ERRORHANDLERS_SYMBOL } from "~/context.ts";
 import type { ErrorFunction } from "~/methods/onError.ts";
-import type { Owner } from "~/objects/owner.ts";
+import type { Scope } from "~/objects/scope.ts";
 import { castError } from "~/utils/castError.ts";
 
-export function runWithOwner<T>(
+export function runWithScope<T>(
   fn: () => T,
-  owner: Owner,
-  tracking: boolean,
+  owner: Scope | null,
+  tracking = true,
 ): T | undefined {
-  const PREV_OBSERVER = CONTEXT.OWNER;
+  const PREV_OBSERVER = CONTEXT.CURRENTSCOPE;
   const PREV_TRACKING = CONTEXT.TRACKING;
 
-  CONTEXT.OWNER = owner;
+  CONTEXT.CURRENTSCOPE = owner;
   CONTEXT.TRACKING = tracking;
 
   try {
@@ -19,7 +19,7 @@ export function runWithOwner<T>(
   } catch (e) {
     const error = castError(e);
 
-    const errorHandlers = CONTEXT.OWNER.get<ErrorFunction[]>(
+    const errorHandlers = CONTEXT.CURRENTSCOPE?.get<ErrorFunction[]>(
       ERRORHANDLERS_SYMBOL,
     );
 
@@ -31,7 +31,7 @@ export function runWithOwner<T>(
       throw error;
     }
   } finally {
-    CONTEXT.OWNER = PREV_OBSERVER;
+    CONTEXT.CURRENTSCOPE = PREV_OBSERVER;
     CONTEXT.TRACKING = PREV_TRACKING;
   }
 }

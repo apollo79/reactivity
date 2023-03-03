@@ -5,7 +5,9 @@ export function runEffects() {
     RUNNING_EFFECTS = true;
 
     EFFECT_QUEUE.forEach((effect) => {
-      effect.updateIfNecessary();
+      if (!effect.isZombie()) {
+        effect.updateIfNecessary();
+      }
     });
 
     EFFECT_QUEUE = [];
