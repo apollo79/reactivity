@@ -71,4 +71,10 @@ export class Observable<T = unknown> {
       observer.stale(change);
     });
   }
+
+  peek(): T {
+    this.parent?.updateIfNecessary();
+
+    return this.value;
+  }
 }
