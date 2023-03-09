@@ -1,7 +1,8 @@
 import { type ComputationFunction } from "~/objects/computation.ts";
 import type { ObservableOptions } from "~/objects/observable.ts";
+import { ComputationNode } from "~/objects/computation.ts";
 import { NoInfer } from "../context.ts";
-import { Effect } from "../objects/effect.ts";
+import { dispose } from "../objects/scope.ts";
 
 export type EffectFunction<
   Prev,
@@ -21,8 +22,12 @@ export function createEffect<Next, Init>(
   fn: EffectFunction<Init | Next, Next>,
   value?: Init,
 ): () => void {
-  // @ts-ignore this is ok with the overloads but ts doesn't like it
-  const computation = new Effect(fn, value);
+  // @ts-ignore
+  const computation = new ComputationNode(fn, value, {
+    isEffect: true,
+  });
 
-  return computation.dispose.bind(computation);
+  return dispose.bind(computation);
+
+  // return computation.dispose.bind(computation);
 }

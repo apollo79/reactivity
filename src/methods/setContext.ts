@@ -10,5 +10,5 @@ export function setContext<T>(
     return;
   }
 
-  scope.set(id, value);
+  scope.contexts[id] = value;
 }

@@ -1,12 +1,17 @@
-import { Effect } from "./objects/effect.ts";
+import {
+  Computation,
+  isZombie,
+  updateIfNecessary,
+} from "~/objects/computation.ts";
 
 export function runEffects() {
   if (EFFECT_QUEUE.length !== 0) {
     RUNNING_EFFECTS = true;
 
     EFFECT_QUEUE.forEach((effect) => {
-      if (!effect.isZombie()) {
-        effect.updateIfNecessary();
+      isZombie(effect);
+      if (!isZombie(effect)) {
+        updateIfNecessary(effect);
       }
     });
 
@@ -25,4 +30,4 @@ export function flushEffects() {
 export let SCHEDULED_EFFECTS = false;
 export let RUNNING_EFFECTS = false;
 
-export let EFFECT_QUEUE: Effect<unknown, unknown>[] = [];
+export let EFFECT_QUEUE: Computation<unknown, unknown>[] = [];

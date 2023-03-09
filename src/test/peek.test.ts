@@ -1,12 +1,4 @@
-import {
-  createEffect,
-  createMemo,
-  createRoot,
-  createSignal,
-  getScope,
-  onDispose,
-  tick,
-} from "#/mod.ts";
+import { createEffect, createMemo, createSignal, tick } from "#/mod.ts";
 import {
   assertSpyCalls,
   assertStrictEquals,

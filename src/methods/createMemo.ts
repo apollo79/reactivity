@@ -1,7 +1,8 @@
 import type { EffectFunction } from "~/methods/createEffect.ts";
-import type { Accessor, ObservableOptions } from "~/objects/observable.ts";
-import { NoInfer } from "../context.ts";
-import { Memo as MemoClass } from "../objects/memo.ts";
+import { ComputationNode } from "~/objects/computation.ts";
+import { Accessor, ObservableOptions, write } from "~/objects/observable.ts";
+import { NoInfer } from "~/context.ts";
+// import { Memo as MemoClass, MemoNode } from "../objects/memo.ts";
 
 export type Memo<T> = Accessor<T> & {
   peek: Accessor<T>;
@@ -20,11 +21,18 @@ export function createMemo<Next extends Prev, Init, Prev>(
   value?: Init,
   options?: ObservableOptions<Next>,
 ): Memo<Next> {
-  const { prevValue } = new MemoClass(fn, value, options);
+  const memoOptions = Object.assign(options ?? {}, {
+    isEffect: false,
+  });
 
-  const accessor = prevValue.get.bind(prevValue) as Memo<Next>;
+  // @ts-ignore
+  const { prevValue } = new ComputationNode(fn, value, memoOptions);
 
-  accessor.peek = prevValue.peek.bind(prevValue);
+  const accessor = write.bind(prevValue) as Memo<Next>;
+
+  // const accessor = prevValue.get.bind(prevValue) as Memo<Next>;
+
+  // accessor.peek = prevValue.peek.bind(prevValue);
 
   return accessor;
 }
