@@ -1,4 +1,4 @@
-import { createEffect, createRoot, getScope, untrack } from "#/mod.ts";
+import { createEffect, createRoot, getOwner, untrack } from "#/mod.ts";
 import {
   assertExists,
   assertNotEquals,
@@ -9,14 +9,14 @@ import {
 
 describe("getOwner", () => {
   it("should return the owner of the current computation", () => {
-    const nullOwner = getScope();
+    const nullOwner = getOwner();
     assertStrictEquals(nullOwner, null);
 
     createRoot(() => {
-      const outerOwner = getScope();
+      const outerOwner = getOwner();
 
       createEffect(() => {
-        const owner = getScope();
+        const owner = getOwner();
         assertExists(owner);
         assertNotEquals(owner, outerOwner);
       });
@@ -25,10 +25,10 @@ describe("getOwner", () => {
 
   it("should return the owner of the computation in untrack", () => {
     createRoot(() => {
-      const owner = getScope();
+      const owner = getOwner();
 
       untrack(() => {
-        const currentOwner = getScope();
+        const currentOwner = getOwner();
         assertExists(currentOwner);
         assertStrictEquals(currentOwner, owner);
       });

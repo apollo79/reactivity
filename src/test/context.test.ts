@@ -2,7 +2,7 @@ import {
   createEffect,
   createRoot,
   getContext,
-  getScope,
+  getOwner,
   type Scope,
   setContext,
 } from "#/mod.ts";
@@ -40,7 +40,7 @@ describe("context", () => {
     const key = Symbol();
 
     createRoot(() => {
-      scope = getScope()!;
+      scope = getOwner()!;
       createRoot(() => {
         createEffect(() => {
           setContext(key, 200, scope);

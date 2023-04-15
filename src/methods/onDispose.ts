@@ -9,7 +9,7 @@ export function onDispose(fn: CleanupFunction) {
 
   const owner = CONTEXT.CURRENTSCOPE;
 
-  owner?.cleanups.push(fn);
+  owner?.disposal.push(fn);
 
   return () => {
     // if (owner?.state === STATE_DISPOSED) {
@@ -18,6 +18,6 @@ export function onDispose(fn: CleanupFunction) {
 
     fn();
 
-    owner.cleanups.splice(owner.cleanups.indexOf(fn), 1);
+    owner.disposal.splice(owner.disposal.indexOf(fn), 1);
   };
 }

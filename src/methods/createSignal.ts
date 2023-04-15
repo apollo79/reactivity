@@ -8,7 +8,6 @@ import { Observable } from "~/objects/observable.ts";
 export type SignalOptions<T> = ObservableOptions<T>;
 export type Signal<T> = Accessor<T> & {
   set: Setter<T>;
-  peek: Accessor<T>;
 };
 
 export function createSignal<T>(): Signal<T | undefined>;
@@ -19,13 +18,11 @@ export function createSignal<T>(
 export function createSignal<T>(value?: T, options?: SignalOptions<T>) {
   const observable = new Observable<T>(value, options);
 
-  const { get, set, peek } = observable;
+  const { read, write } = observable;
 
-  const signal = get.bind(observable) as Signal<T>;
+  const signal = read.bind(observable) as Signal<T>;
 
-  signal.set = set.bind(observable);
-
-  signal.peek = peek.bind(observable);
+  signal.set = write.bind(observable);
 
   return signal;
 }

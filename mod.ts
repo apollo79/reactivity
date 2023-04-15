@@ -8,8 +8,8 @@ export { setContext } from "~/methods/setContext.ts";
 export { untrack } from "~/methods/untrack.ts";
 export { onDispose } from "~/methods/onDispose.ts";
 export { onError } from "~/methods/onError.ts";
-export { getScope } from "~/utils/getScope.ts";
-export { runWithScope } from "~/utils/runWithScope.ts";
+export { getOwner } from "~/utils/getOwner.ts";
+export { runWithOwner } from "~/utils/runWithOwner.ts";
 export { tick } from "~/methods/tick.ts";
 
 export type { Scope } from "~/objects/scope.ts";

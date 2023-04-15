@@ -3,7 +3,7 @@ import type { ErrorFunction } from "~/methods/onError.ts";
 import type { Scope } from "~/objects/scope.ts";
 import { castError } from "~/utils/castError.ts";
 
-export function runWithScope<T>(
+export function runWithOwner<T>(
   fn: () => T,
   owner: Scope | null,
   tracking = true,

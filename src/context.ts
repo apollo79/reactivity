@@ -21,7 +21,7 @@ export type CacheState =
   | typeof STATE_DIRTY
   | typeof STATE_DISPOSED;
 
-export const ERRORHANDLERS_SYMBOL = Symbol("Error");
+export const ERRORHANDLERS_SYMBOL = Symbol("Errorhandlers");
 
 // Magic type that when used at sites where generic types are inferred from, will prevent those sites from being involved in the inference.
 // https://github.com/microsoft/TypeScript/issues/14829

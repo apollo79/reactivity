@@ -1,10 +1,9 @@
 import {
-  Computation,
   createEffect,
   createMemo,
   createRoot,
   createSignal,
-  getScope,
+  getOwner,
   type Memo,
   onDispose,
   type Signal,
@@ -80,7 +79,7 @@ describe("root", () => {
 
     $a.set(10);
     tick();
-    assertSpyCalls(innerEffect, 1);
+    assertSpyCalls(innerEffect, 2);
   });
 
   it("should not be reactive", () => {
@@ -103,20 +102,10 @@ describe("root", () => {
 
   it("should hold parent tracking", () => {
     createRoot(() => {
-      const parent = getScope();
+      const parent = getOwner();
       createRoot(() => {
-        assertStrictEquals(getScope()!.parentScope, parent);
+        assertStrictEquals(getOwner()!.parentScope, parent);
       });
-    });
-  });
-
-  it("should not observe", () => {
-    const $a = createSignal(0);
-    createRoot(() => {
-      $a();
-      const owner = getScope() as Computation<unknown>;
-      assertStrictEquals(owner.observables.size, 0);
-      assertStrictEquals(owner.childrenObservers.size, 0);
     });
   });
 

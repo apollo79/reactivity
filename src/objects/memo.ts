@@ -3,6 +3,9 @@ import { Computation, ComputationFunction } from "./computation.ts";
 import { Observable } from "./observable.ts";
 import type { ObservableOptions } from "./observable.ts";
 
+/**
+ * A memo is a computation that stores the last return value of its execution as observable so it can be depended on
+ */
 export class Memo<Next, Init = unknown> extends Computation<Next, Init> {
   prevValue: Observable<Next>;
   init?: Init;
@@ -20,19 +23,24 @@ export class Memo<Next, Init = unknown> extends Computation<Next, Init> {
     this.prevValue.parent = this as Memo<Next, unknown>;
   }
 
-  run(): Next {
-    return this.prevValue.set(
+  override update(): Next {
+    return this.prevValue.write(
       super.runComputation(this.prevValue.value ?? this.init),
     );
   }
 
-  stale(newState: CacheState) {
+  /**
+   * Sets the state and notifies all observers about the new state
+   * @param newState the new state
+   */
+  override stale(newState: CacheState): void {
     if (this.state >= newState) {
       return;
     }
 
     this.state = newState;
 
+    // notify observers
     this.prevValue.stale(STATE_CHECK);
   }
 }

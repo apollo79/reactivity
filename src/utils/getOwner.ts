@@ -1,6 +1,6 @@
 import { CONTEXT } from "~/context.ts";
 import type { Scope } from "~/objects/scope.ts";
 
-export function getScope(): Scope | null {
+export function getOwner(): Scope | null {
   return CONTEXT.CURRENTSCOPE;
 }
