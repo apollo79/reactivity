@@ -18,7 +18,7 @@ export function createMemo<Next extends Prev, Init, Prev>(
   value?: Init,
   options?: ObservableOptions<Next>,
 ): Memo<Next> {
-  const { prevValue } = new MemoClass(fn, value, options);
+  const { prevValue } = new MemoClass(fn, value as Next, options);
 
   const accessor = prevValue.read.bind(prevValue) as Memo<Next>;
 

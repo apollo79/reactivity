@@ -4,14 +4,11 @@ import { Computation, ComputationFunction } from "./computation.ts";
 /**
  * An effect is executed immediately on creation and every time again when one of its dependencies changes
  */
-export class Effect<Next, Init = unknown> extends Computation<Next, Init> {
+export class Effect<T> extends Computation<T> {
   /** Stores the last return value of the callback */
-  prevValue: Next | Init | undefined;
+  prevValue: T | undefined;
 
-  constructor(
-    fn: ComputationFunction<undefined | Init | Next, Next>,
-    init?: Init,
-  ) {
+  constructor(fn: ComputationFunction<undefined | T, T>, init?: T) {
     super(fn);
 
     this.prevValue = init;
@@ -21,8 +18,8 @@ export class Effect<Next, Init = unknown> extends Computation<Next, Init> {
   /**
    * Just runs the callback with this effect as scope
    */
-  override update(): Next {
-    const result = super.runComputation(this.prevValue);
+  override update(): T {
+    const result = super.run(this.prevValue);
 
     this.prevValue = result;
 

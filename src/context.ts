@@ -11,7 +11,7 @@ type Context = {
   CURRENTSCOPE: Scope | null;
   TRACKING: boolean;
   SCHEDULER: Scheduler;
-  BATCH: Effect<any, any>[] | null;
+  BATCH: Effect<any>[] | null;
 };
 
 export const CONTEXT: Context = {

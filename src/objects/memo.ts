@@ -6,27 +6,22 @@ import type { ObservableOptions } from "./observable.ts";
 /**
  * A memo is a computation that stores the last return value of its execution as observable so it can be depended on
  */
-export class Memo<Next, Init = unknown> extends Computation<Next, Init> {
-  prevValue: Observable<Next>;
-  init?: Init;
+export class Memo<T> extends Computation<T> {
+  prevValue: Observable<T>;
 
   constructor(
-    fn: ComputationFunction<undefined | Init | Next, Next>,
-    init?: Init,
-    options?: ObservableOptions<Next>,
+    fn: ComputationFunction<undefined | T, T>,
+    init?: T,
+    options?: ObservableOptions<T>,
   ) {
     super(fn);
 
-    this.init = init;
-
-    this.prevValue = new Observable<Next>(undefined, options);
-    this.prevValue.parent = this as Memo<Next, unknown>;
+    this.prevValue = new Observable(init, options);
+    this.prevValue.parent = this;
   }
 
-  override update(): Next {
-    return this.prevValue.write(
-      super.runComputation(this.prevValue.value ?? this.init),
-    );
+  override update(): T {
+    return this.prevValue.write(super.run(this.prevValue.value));
   }
 
   /**

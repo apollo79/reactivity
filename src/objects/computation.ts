@@ -15,12 +15,12 @@ export type ComputationFunction<Prev, Next extends Prev = Prev> = (
 /**
  * A computation is a scope and the abstraction over effects and memos.
  */
-export abstract class Computation<Next, Init = unknown> extends Scope {
+export abstract class Computation<T> extends Scope {
   /** One part of the double-linked list between observables and computations. It holds all observables that this computation depends on. */
   readonly sources = new Set<Observable>();
-  readonly fn: ComputationFunction<undefined | Init | Next, Next>;
+  readonly fn: ComputationFunction<undefined | T, T>;
 
-  constructor(fn: ComputationFunction<undefined | Init | Next, Next>) {
+  constructor(fn: ComputationFunction<undefined | T, T>) {
     super();
     this.fn = fn;
     // Register under the parent scope for the parent's disposal
@@ -35,9 +35,7 @@ export abstract class Computation<Next, Init = unknown> extends Scope {
     super.dispose();
 
     this.sources.forEach((observable) => {
-      observable.observers.delete(
-        this as unknown as Computation<unknown, unknown>,
-      );
+      observable.observers.delete(this);
     });
 
     this.sources.clear();
@@ -45,13 +43,13 @@ export abstract class Computation<Next, Init = unknown> extends Scope {
     this.parentScope?.childrenScopes.delete(this);
   }
 
-  abstract update(): Next;
+  abstract update(): T;
 
   /**
    * Runs the callback with this computation as scope. This is used in the effects and memos `run` methods.
    * @param prevValue The result of the previous execution or the init value of a memo to pass to the callback
    */
-  runComputation(prevValue: Next | Init | undefined): Next {
+  run(prevValue: T | undefined): T {
     this.dispose();
 
     this.parentScope?.childrenScopes.add(this);

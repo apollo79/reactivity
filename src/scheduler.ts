@@ -1,6 +1,5 @@
 import { STATE_CLEAN } from "./context.ts";
 import { Effect } from "./objects/effect.ts";
-import { type Scope } from "./objects/scope.ts";
 
 export type ScheduleMethod = "sync" | "async";
 
@@ -8,11 +7,11 @@ export type ScheduleMethod = "sync" | "async";
  * The scheduler handles the execution of effects
  */
 export abstract class Scheduler {
-  #queue: Effect<any, any>[] = [];
+  #queue: Effect<any>[] = [];
   running = false;
   abstract readonly method: ScheduleMethod;
 
-  enqueue(effect: Effect<any, any>) {
+  enqueue(effect: Effect<any>) {
     this.#queue.push(effect);
   }
 
@@ -33,10 +32,10 @@ export abstract class Scheduler {
   }
 
   /** @see https://github.com/maverick-js/signals/blob/main/src/core.ts#L50 */
-  runTop(node: Effect<any, any>) {
+  runTop(node: Effect<any>) {
     const ancestors = [node];
 
-    while ((node = node.parentScope as Effect<any, any>)) {
+    while ((node = node.parentScope as Effect<any>)) {
       if (node?.state !== STATE_CLEAN) {
         ancestors.push(node);
       }
