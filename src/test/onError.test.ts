@@ -5,12 +5,22 @@ import {
   createSignal,
   type Memo,
   onError,
-  tick,
+  setScheduling,
 } from "#/mod.ts";
 
-import { assertStrictEquals, assertThrows, describe, it } from "./util.ts";
+import {
+  assertStrictEquals,
+  assertThrows,
+  beforeAll,
+  describe,
+  it,
+} from "./util.ts";
 
 describe("onError", () => {
+  beforeAll(() => {
+    setScheduling("sync");
+  });
+
   it("No Handler", () => {
     assertThrows(() => {
       createRoot(() => {
@@ -79,8 +89,6 @@ describe("onError", () => {
       s.set(1);
     });
 
-    tick();
-
     assertStrictEquals(errored, true);
   });
 
@@ -121,8 +129,6 @@ describe("onError", () => {
       s.set(1);
     });
 
-    tick();
-
     assertStrictEquals(errored, true);
   });
 
@@ -147,8 +153,6 @@ describe("onError", () => {
       s.set(1);
     });
 
-    tick();
-
     assertStrictEquals(errored, true);
   });
 
@@ -167,8 +171,6 @@ describe("onError", () => {
     });
 
     memo!();
-
-    tick();
 
     assertStrictEquals(errored, true);
   });

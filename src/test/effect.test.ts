@@ -3,17 +3,22 @@ import {
   createMemo,
   createSignal,
   onDispose,
-  tick,
+  setScheduling,
 } from "#/mod.ts";
 import {
   assertSpyCalls,
   assertStrictEquals,
+  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("effect", () => {
+  beforeAll(() => {
+    setScheduling("sync");
+  });
+
   it("should run effect", () => {
     const $a = createSignal(0),
       $effect = spy(() => void $a());
@@ -22,7 +27,6 @@ describe("effect", () => {
     assertSpyCalls($effect, 1);
 
     $a.set(1);
-    tick();
     assertSpyCalls($effect, 2);
   });
 
@@ -42,16 +46,13 @@ describe("effect", () => {
     assertSpyCalls(effectA, 1);
 
     $a.set(20);
-    tick();
     assertSpyCalls(effectA, 2);
 
     $b.set(20);
-    tick();
     assertSpyCalls(effectA, 3);
 
     $a.set(20);
     $b.set(20);
-    tick();
     assertSpyCalls(effectA, 3);
   });
 
@@ -78,26 +79,22 @@ describe("effect", () => {
     assertSpyCalls(innerDispose, 0);
 
     $b.set(1);
-    tick();
 
     assertSpyCalls(outerEffect, 1);
     assertSpyCalls(innerEffect, 2);
     assertSpyCalls(innerDispose, 1);
 
     $b.set(2);
-    tick();
     assertSpyCalls(outerEffect, 1);
     assertSpyCalls(innerEffect, 3);
     assertSpyCalls(innerDispose, 2);
 
     $a.set(1);
-    tick();
     assertSpyCalls(outerEffect, 2);
     assertSpyCalls(innerEffect, 4); // new one is created
     assertSpyCalls(innerDispose, 3);
 
     $b.set(3);
-    tick();
     assertSpyCalls(outerEffect, 2);
     assertSpyCalls(innerEffect, 5);
     assertSpyCalls(innerDispose, 4);
@@ -123,7 +120,6 @@ describe("effect", () => {
     stop();
 
     $a.set(20);
-    tick();
     assertSpyCalls(effectA, 1);
   });
 
@@ -141,8 +137,7 @@ describe("effect", () => {
 
   //     for (let i = 1; i <= 3; i += 1) {
   //       $a.set(i);
-  //       tick();
-  //       assertSpyCalls(dispose, i);
+  //         //       assertSpyCalls(dispose, i);
   //     }
   //   });
 
@@ -171,7 +166,6 @@ describe("effect", () => {
 
     for (let i = 1; i <= 3; i += 1) {
       $a.set(i);
-      tick();
       assertSpyCalls(effectA, i + 1);
       assertSpyCalls(disposeA, i);
       assertSpyCalls(disposeB, i);
@@ -191,7 +185,6 @@ describe("effect", () => {
     stop();
 
     $a.set(10);
-    tick();
     assertSpyCalls(innerEffect, 1);
   });
 
@@ -210,23 +203,18 @@ describe("effect", () => {
     assertSpyCalls($effect, 1);
 
     $b.set(1);
-    tick();
     assertSpyCalls($effect, 1);
 
     $a.set(1);
-    tick();
     assertSpyCalls($effect, 2);
 
     $cond.set(false);
-    tick();
     assertSpyCalls($effect, 2);
 
     $b.set(2);
-    tick();
     assertSpyCalls($effect, 3);
 
     $a.set(3);
-    tick();
     assertSpyCalls($effect, 3);
   });
 
@@ -251,7 +239,6 @@ describe("effect", () => {
     createEffect(() => ($cond() ? fnA() : fnB()));
 
     $cond.set(false);
-    tick();
     assertSpyCalls(disposeA, 1);
   });
 
@@ -279,22 +266,18 @@ describe("effect", () => {
       //   { id: "root-effect" },
     );
 
-    tick();
-
     assertStrictEquals(values.length, 3);
     assertStrictEquals(values.join(","), "0,0,1");
 
     loop = 1;
     values = [];
     $value.set(1);
-    tick();
 
     assertStrictEquals(values.length, 2);
     assertStrictEquals(values.join(","), "1,1");
 
     values = [];
     $value.set(2);
-    tick();
 
     assertStrictEquals(values.length, 2);
     assertStrictEquals(values.join(","), "2,2");

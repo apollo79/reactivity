@@ -4,25 +4,29 @@ import {
   createRoot,
   createSignal,
   onError,
-  tick,
+  setScheduling,
 } from "#/mod.ts";
 import {
   assertSpyCallArg,
   assertSpyCalls,
   assertStrictEquals,
+  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("memo", () => {
+  beforeAll(() => {
+    setScheduling("sync");
+  });
+
   it("should store and return value on read", () => {
     const $a = createSignal(10);
     const $b = createSignal(10);
     const $c = createMemo(() => $a() + $b());
 
     assertStrictEquals($c(), 20);
-    tick();
 
     // Try again to ensure state is maintained.
     assertStrictEquals($c(), 20);
@@ -115,7 +119,6 @@ describe("memo", () => {
     assertStrictEquals($e(), 20);
 
     $a.set(20);
-    tick();
 
     $e();
     assertSpyCalls(computeC, 2);
@@ -123,7 +126,6 @@ describe("memo", () => {
     assertStrictEquals($e(), 30);
 
     $b.set(20);
-    tick();
 
     $e();
     assertSpyCalls(computeC, 2);
@@ -146,11 +148,9 @@ describe("memo", () => {
     assertStrictEquals($c(), 1);
 
     $a.set(0);
-    tick();
     assertStrictEquals($c(), 0);
 
     $b.set(10);
-    tick();
     assertStrictEquals($c(), 10);
   });
 
@@ -171,13 +171,11 @@ describe("memo", () => {
     assertStrictEquals($b(), 0);
     assertSpyCalls(effectA, 1);
     $a.set(2);
-    tick();
     assertStrictEquals($b(), 2);
     assertSpyCalls(effectA, 2);
 
     // no-change
     $a.set(3);
-    tick();
     assertStrictEquals($b(), 2);
     assertSpyCalls(effectA, 2);
   });

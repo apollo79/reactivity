@@ -2,12 +2,16 @@ import {
   createEffect,
   createRoot,
   createSignal,
-  tick,
+  setScheduling,
   untrack,
 } from "#/mod.ts";
-import { assertStrictEquals, describe, it } from "./util.ts";
+import { assertStrictEquals, beforeAll, describe, it } from "./util.ts";
 
 describe("untrack", () => {
+  beforeAll(() => {
+    setScheduling("sync");
+  });
+
   it("should mute an effect", () => {
     createRoot(() => {
       let temp!: string;
@@ -18,7 +22,6 @@ describe("untrack", () => {
 
       assertStrictEquals(temp, "unpure thoughts");
       sign.set("mind");
-      tick();
       assertStrictEquals(temp, "unpure thoughts");
     });
   });

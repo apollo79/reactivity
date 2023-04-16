@@ -5,17 +5,20 @@ import {
   Scheduler,
   SyncScheduler,
 } from "./scheduler.ts";
+import { Effect } from "./objects/effect.ts";
 
 type Context = {
   CURRENTSCOPE: Scope | null;
   TRACKING: boolean;
   SCHEDULER: Scheduler;
+  BATCH: Effect<any, any>[] | null;
 };
 
 export const CONTEXT: Context = {
   CURRENTSCOPE: null,
   TRACKING: false,
   SCHEDULER: new SyncScheduler(),
+  BATCH: null,
 };
 
 export function setScheduling(scheduleMethod: ScheduleMethod) {

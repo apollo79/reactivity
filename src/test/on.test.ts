@@ -1,7 +1,17 @@
-import { createEffect, createRoot, createSignal, on, tick } from "#/mod.ts";
-import { assertStrictEquals, describe, it } from "./util.ts";
+import {
+  createEffect,
+  createRoot,
+  createSignal,
+  on,
+  setScheduling,
+} from "#/mod.ts";
+import { assertStrictEquals, beforeAll, describe, it } from "./util.ts";
 
 describe("on", () => {
+  beforeAll(() => {
+    setScheduling("sync");
+  });
+
   it("should create an effect with an explicit dep", () => {
     let temp: string;
 
@@ -43,7 +53,6 @@ describe("on", () => {
     assertStrictEquals(temp!, undefined);
 
     sign.set("minds");
-    tick();
 
     assertStrictEquals(temp!, "impure minds");
   });

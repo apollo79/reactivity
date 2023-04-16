@@ -3,6 +3,7 @@ export { createEffect } from "~/methods/createEffect.ts";
 export { on } from "~/methods/on.ts";
 export { createMemo } from "~/methods/createMemo.ts";
 export { createRoot } from "~/methods/createRoot.ts";
+export { batch } from "~/methods/batch.ts";
 export { getContext } from "~/methods/getContext.ts";
 export { setContext } from "~/methods/setContext.ts";
 export { untrack } from "~/methods/untrack.ts";

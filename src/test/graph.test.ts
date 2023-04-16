@@ -1,15 +1,20 @@
 // https://github.com/preactjs/signals/blob/main/packages/core/test/signal.test.tsx#L1249
 
-import { createMemo, createSignal, tick } from "#/mod.ts";
+import { createMemo, createSignal, setScheduling } from "#/mod.ts";
 import {
   assertSpyCalls,
   assertStrictEquals,
+  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("graph", () => {
+  beforeAll(() => {
+    setScheduling("sync");
+  });
+
   it("should drop A->B->A updates", () => {
     //     A
     //   / |
@@ -31,7 +36,6 @@ describe("graph", () => {
 
     $a.set(4);
     $d();
-    tick();
     assertSpyCalls(compute, 2);
   });
 
@@ -55,7 +59,6 @@ describe("graph", () => {
     assertSpyCalls(compute, 1);
 
     $a.set("aa");
-    tick();
     assertStrictEquals($d(), "aa aa");
     assertSpyCalls(compute, 2);
   });
@@ -82,7 +85,6 @@ describe("graph", () => {
     assertSpyCalls(compute, 1);
 
     $a.set("aa");
-    tick();
     assertStrictEquals($e(), "aa aa");
     assertSpyCalls(compute, 2);
   });
@@ -105,7 +107,6 @@ describe("graph", () => {
     assertSpyCalls(compute, 1);
 
     $a.set("aa");
-    tick();
     assertStrictEquals($c(), "foo");
     assertSpyCalls(compute, 1);
   });
@@ -142,7 +143,6 @@ describe("graph", () => {
     assertSpyCalls(gSpy, 1);
 
     $a.set("b");
-    tick();
 
     assertStrictEquals($e(), "b b");
     assertSpyCalls(eSpy, 2);
@@ -154,7 +154,6 @@ describe("graph", () => {
     assertSpyCalls(gSpy, 2);
 
     $a.set("c");
-    tick();
 
     assertStrictEquals($e(), "c c");
     assertSpyCalls(eSpy, 3);
@@ -180,7 +179,6 @@ describe("graph", () => {
     assertStrictEquals($b(), "a");
     assertSpyCalls(compute, 0);
     $a.set("aa");
-    tick();
 
     assertStrictEquals($b(), "aa");
     assertSpyCalls(compute, 0);
@@ -209,7 +207,6 @@ describe("graph", () => {
 
     assertStrictEquals($d(), "a c");
     $a.set("aa");
-    tick();
 
     assertStrictEquals($d(), "aa c");
     assertSpyCalls(compute, 2);
@@ -241,7 +238,6 @@ describe("graph", () => {
     assertStrictEquals($e(), "a c d");
 
     $a.set("aa");
-    tick();
 
     assertStrictEquals($e(), "aa c d");
     assertSpyCalls(compute, 2);
