@@ -86,6 +86,8 @@ export class Observable<T = unknown> {
 
       // notify computations about the new value
       this.stale(STATE_DIRTY);
+
+      CONTEXT.SCHEDULER.flush();
     }
 
     return this.value;

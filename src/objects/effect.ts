@@ -1,5 +1,4 @@
-import { CacheState, STATE_CLEAN } from "~/context.ts";
-import { EFFECT_QUEUE, flushEffects, SCHEDULED_EFFECTS } from "~/scheduler.ts";
+import { CacheState, CONTEXT, STATE_CLEAN } from "~/context.ts";
 import { Computation, ComputationFunction } from "./computation.ts";
 
 /**
@@ -40,12 +39,12 @@ export class Effect<Next, Init = unknown> extends Computation<Next, Init> {
     }
 
     if (this.state === STATE_CLEAN) {
-      EFFECT_QUEUE.push(this as Effect<unknown, unknown>);
+      CONTEXT.SCHEDULER.enqueue(this);
 
       // If not already done in another effect, queue a microtask to execute all effects
-      if (!SCHEDULED_EFFECTS) {
-        flushEffects();
-      }
+      // if (!SCHEDULED_EFFECTS) {
+      //   flushEffects();
+      // }
     }
 
     this.state = newState;

@@ -1,7 +1,11 @@
-import { createEffect, createSignal, tick } from "#/mod.ts";
-import { assertSpyCalls, describe, it, spy } from "./util.ts";
+import { createEffect, createSignal, setScheduling, tick } from "#/mod.ts";
+import { assertSpyCalls, beforeAll, describe, it, spy } from "./util.ts";
 
 describe("tick", () => {
+  beforeAll(() => {
+    setScheduling("async");
+  });
+
   it("should batch updates", () => {
     const $a = createSignal(10);
     const $effect = spy(() => void $a());

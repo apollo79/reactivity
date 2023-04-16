@@ -21,7 +21,7 @@ export abstract class Scope {
    */
   readonly childrenScopes = new Set<Scope>();
   /** Custom cleanup functions */
-  readonly disposal: CleanupFunction[] = [];
+  disposal: CleanupFunction[] = [];
   /**
    * stores contexts values and error handlers
    * @see onError.ts
@@ -53,7 +53,7 @@ export abstract class Scope {
       cleanup();
     });
 
-    this.disposal.length = 0;
+    this.disposal = [];
 
     this.contexts = {};
   }

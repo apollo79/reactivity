@@ -11,6 +11,7 @@ export { onError } from "~/methods/onError.ts";
 export { getOwner } from "~/utils/getOwner.ts";
 export { runWithOwner } from "~/utils/runWithOwner.ts";
 export { tick } from "~/methods/tick.ts";
+export { setScheduling } from "~/context.ts";
 
 export type { Scope } from "~/objects/scope.ts";
 export type { Accessor, Setter } from "~/objects/observable.ts";

@@ -18,10 +18,9 @@ export function createEffect<Next, Init = Next>(
   value: Init,
 ): () => void;
 export function createEffect<Next, Init>(
-  fn: EffectFunction<Init | Next, Next>,
+  fn: EffectFunction<undefined | Init | Next, Next>,
   value?: Init,
 ): () => void {
-  // @ts-ignore this is ok with the overloads but ts doesn't like it
   const computation = new Effect(fn, value);
 
   return computation.dispose.bind(computation);

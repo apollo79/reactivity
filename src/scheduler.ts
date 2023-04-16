@@ -1,28 +1,70 @@
 import { Effect } from "./objects/effect.ts";
 
-export function runEffects() {
-  if (EFFECT_QUEUE.length !== 0) {
-    RUNNING_EFFECTS = true;
+export type ScheduleMethod = "sync" | "async";
 
-    EFFECT_QUEUE.forEach((effect) => {
-      if (!effect.isZombie()) {
-        effect.updateIfNecessary();
-      }
-    });
+/**
+ * The scheduler handles the execution of effects
+ */
+export abstract class Scheduler {
+  #queue: Effect<any, any>[] = [];
+  running = false;
+  abstract readonly method: ScheduleMethod;
 
-    EFFECT_QUEUE = [];
-    RUNNING_EFFECTS = false;
+  enqueue(effect: Effect<any, any>) {
+    this.#queue.push(effect);
   }
 
-  SCHEDULED_EFFECTS = false;
+  runEffects() {
+    if (this.#queue.length) {
+      this.running = true;
+
+      this.#queue.forEach((effect) => {
+        if (!effect.isZombie()) {
+          effect.updateIfNecessary();
+        }
+      });
+
+      this.#queue = [];
+      this.running = false;
+    }
+  }
+
+  abstract flush(): void;
 }
 
-export function flushEffects() {
-  SCHEDULED_EFFECTS = true;
-  queueMicrotask(runEffects);
+/**
+ * The sync scheduler is executed after every change to a signal
+ */
+export class SyncScheduler extends Scheduler {
+  override method = "sync" as ScheduleMethod;
+
+  override flush(): void {
+    this.runEffects();
+  }
 }
 
-export let SCHEDULED_EFFECTS = false;
-export let RUNNING_EFFECTS = false;
+/**
+ * The async scheduler allows automatic batching by deferring the execution of effects to the next microtask
+ */
+export class AsyncScheduler extends Scheduler {
+  override method = "async" as ScheduleMethod;
+  scheduled = false;
 
-export let EFFECT_QUEUE: Effect<unknown, unknown>[] = [];
+  override runEffects(): void {
+    super.runEffects();
+
+    this.scheduled = false;
+  }
+
+  override flush(): void {
+    if (this.scheduled) {
+      return;
+    }
+
+    this.scheduled = true;
+
+    queueMicrotask(() => {
+      this.runEffects();
+    });
+  }
+}

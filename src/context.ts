@@ -1,14 +1,34 @@
 import type { Scope } from "~/objects/scope.ts";
+import {
+  AsyncScheduler,
+  ScheduleMethod,
+  Scheduler,
+  SyncScheduler,
+} from "./scheduler.ts";
 
 type Context = {
   CURRENTSCOPE: Scope | null;
   TRACKING: boolean;
+  SCHEDULER: Scheduler;
 };
 
 export const CONTEXT: Context = {
   CURRENTSCOPE: null,
   TRACKING: false,
+  SCHEDULER: new SyncScheduler(),
 };
+
+export function setScheduling(scheduleMethod: ScheduleMethod) {
+  if (CONTEXT.SCHEDULER.method === scheduleMethod) {
+    return;
+  }
+
+  const NewScheduler = scheduleMethod === "sync"
+    ? SyncScheduler
+    : AsyncScheduler;
+
+  CONTEXT.SCHEDULER = new NewScheduler();
+}
 
 export const STATE_CLEAN = 1;
 export const STATE_CHECK = 2;
