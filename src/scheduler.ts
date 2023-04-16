@@ -1,4 +1,6 @@
+import { STATE_CLEAN } from "./context.ts";
 import { Effect } from "./objects/effect.ts";
+import { type Scope } from "./objects/scope.ts";
 
 export type ScheduleMethod = "sync" | "async";
 
@@ -19,13 +21,29 @@ export abstract class Scheduler {
       this.running = true;
 
       this.#queue.forEach((effect) => {
-        if (!effect.isZombie()) {
-          effect.updateIfNecessary();
+        // The state can be clean if the effect is the parent of one of the other effects in the queue and was therefore executed by an earlier `runTop` call
+        if (effect.state !== STATE_CLEAN) {
+          this.runTop(effect);
         }
       });
 
       this.#queue = [];
       this.running = false;
+    }
+  }
+
+  /** @see https://github.com/maverick-js/signals/blob/main/src/core.ts#L50 */
+  runTop(node: Effect<any, any>) {
+    const ancestors = [node];
+
+    while ((node = node.parentScope as Effect<any, any>)) {
+      if (node?.state !== STATE_CLEAN) {
+        ancestors.push(node);
+      }
+    }
+
+    for (let i = ancestors.length - 1; i >= 0; i--) {
+      ancestors[i].updateIfNecessary();
     }
   }
 
