@@ -11,6 +11,7 @@ export { onDispose } from "~/methods/onDispose.ts";
 export { onError } from "~/methods/onError.ts";
 export { getOwner } from "~/utils/getOwner.ts";
 export { runWithOwner } from "~/utils/runWithOwner.ts";
+export { catchError } from "~/methods/catchError.ts";
 export { tick } from "~/methods/tick.ts";
 export { setScheduling } from "~/context.ts";
 

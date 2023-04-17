@@ -12,7 +12,6 @@ export class Effect<T> extends Computation<T> {
     super(fn);
 
     this.prevValue = init;
-    this.update();
   }
 
   /**

@@ -9,7 +9,7 @@ import type { CleanupFunction } from "~/methods/onDispose.ts";
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
  */
-export abstract class Scope {
+export class Scope {
   /**
    * The scope gets registered under its parent scope for.
    * This is needed for the parent's disposal and contexts as well as errors as they bubble up

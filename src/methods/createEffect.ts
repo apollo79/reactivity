@@ -23,5 +23,7 @@ export function createEffect<Next, Init>(
 ): () => void {
   const computation = new Effect(fn, value);
 
+  computation.update();
+
   return computation.dispose.bind(computation);
 }

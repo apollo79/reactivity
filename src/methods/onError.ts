@@ -2,6 +2,9 @@ import { CONTEXT, ERRORHANDLERS_SYMBOL } from "~/context.ts";
 
 export type ErrorFunction = (error: Error) => void;
 
+/**
+ * @deprecated
+ */
 export function onError(handler: ErrorFunction) {
   if (CONTEXT.CURRENTSCOPE === null) return;
 
