@@ -1,10 +1,10 @@
 import {
+  type Accessor,
   createEffect,
   createMemo,
   createRoot,
   createSignal,
   getOwner,
-  type Memo,
   onDispose,
   setScheduling,
   type Signal,
@@ -28,7 +28,7 @@ describe("root", () => {
     const computeB = spy();
 
     let $a: Signal<number>;
-    let $b: Memo<number>;
+    let $b: Accessor<number>;
 
     createRoot((dispose) => {
       $a = createSignal(10);

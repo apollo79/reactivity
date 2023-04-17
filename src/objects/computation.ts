@@ -1,5 +1,6 @@
 import {
   type CacheState,
+  ERRORTHROWN_SYMBOL,
   STATE_CHECK,
   STATE_CLEAN,
   STATE_DIRTY,
@@ -49,12 +50,12 @@ export abstract class Computation<T> extends Scope {
    * Runs the callback with this computation as scope. This is used in the effects and memos `run` methods.
    * @param prevValue The result of the previous execution or the init value of a memo to pass to the callback
    */
-  run(prevValue: T | undefined): T {
+  run(prevValue: T | undefined): T | typeof ERRORTHROWN_SYMBOL {
     this.dispose();
 
     this.parentScope?.childrenScopes.add(this);
 
-    const result = runWithOwner(() => this.fn(prevValue), this, true)!;
+    const result = runWithOwner(() => this.fn(prevValue), this, true);
 
     this.state = STATE_CLEAN;
 

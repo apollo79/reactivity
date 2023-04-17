@@ -1,26 +1,28 @@
 import type { EffectFunction } from "~/methods/createEffect.ts";
-import type { Accessor, ObservableOptions } from "~/objects/observable.ts";
-import { NoInfer } from "../context.ts";
-import { Memo as MemoClass } from "../objects/memo.ts";
-
-export type Memo<T> = Accessor<T>;
+import type { Accessor } from "~/objects/observable.ts";
+import type { NoInfer } from "../context.ts";
+import { Memo, type MemoOptions } from "../objects/memo.ts";
 
 export function createMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
-): Memo<Next>;
+): Accessor<Next>;
 export function createMemo<Next extends Prev, Init = Next, Prev = Next>(
   fn: EffectFunction<Init | Prev, Next>,
   value: Init,
-  options?: ObservableOptions<Next>,
-): Memo<Next>;
+  options?: MemoOptions<Next>,
+): Accessor<Next>;
 export function createMemo<Next extends Prev, Init, Prev>(
   fn: EffectFunction<undefined | Init | Prev, Next>,
   value?: Init,
-  options?: ObservableOptions<Next>,
-): Memo<Next> {
-  const { prevValue } = new MemoClass(fn, value as Next, options);
+  options?: MemoOptions<Next>,
+): Accessor<Next> {
+  const { prevValue } = new Memo<Init | Next>(
+    fn,
+    value,
+    options as MemoOptions<Init | Next>,
+  );
 
-  const accessor = prevValue.read.bind(prevValue) as Memo<Next>;
+  const accessor = prevValue.read.bind(prevValue) as Accessor<Next>;
 
   return accessor;
 }

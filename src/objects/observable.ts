@@ -26,7 +26,7 @@ export class Observable<T = unknown> {
    * The memo notifies its dependencies over this observable.
    * Plus, when this observable is read, it tells the memo to update if necessary
    */
-  parent?: Memo<T>;
+  parent: Memo<T> | null = null;
   /** One part of the double-linked list between computations and observables. It holds all computations that observe this observable. */
   observers = new Set<Computation<any>>();
   value: T;

@@ -1,4 +1,9 @@
-import { CacheState, CONTEXT, STATE_CLEAN } from "~/context.ts";
+import {
+  CacheState,
+  CONTEXT,
+  ERRORTHROWN_SYMBOL,
+  STATE_CLEAN,
+} from "~/context.ts";
 import { Computation, ComputationFunction } from "./computation.ts";
 
 /**
@@ -20,9 +25,12 @@ export class Effect<T> extends Computation<T> {
   override update(): T {
     const result = super.run(this.prevValue);
 
-    this.prevValue = result;
+    if (result !== ERRORTHROWN_SYMBOL) {
+      this.prevValue = result;
 
-    return result;
+      return result;
+    }
+    return result === ERRORTHROWN_SYMBOL ? undefined! : result;
   }
 
   /**
@@ -36,11 +44,6 @@ export class Effect<T> extends Computation<T> {
 
     if (this.state === STATE_CLEAN) {
       CONTEXT.SCHEDULER.enqueue(this);
-
-      // If not already done in another effect, queue a microtask to execute all effects
-      // if (!SCHEDULED_EFFECTS) {
-      //   flushEffects();
-      // }
     }
 
     this.state = newState;

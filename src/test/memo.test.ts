@@ -1,9 +1,10 @@
 import {
+  type Accessor,
+  catchError,
   createEffect,
   createMemo,
   createRoot,
   createSignal,
-  onError,
   setScheduling,
 } from "#/mod.ts";
 import {
@@ -163,6 +164,7 @@ describe("memo", () => {
     });
 
     const effectA = spy();
+
     createEffect(() => {
       $b();
       effectA();
@@ -170,7 +172,9 @@ describe("memo", () => {
 
     assertStrictEquals($b(), 0);
     assertSpyCalls(effectA, 1);
+
     $a.set(2);
+
     assertStrictEquals($b(), 2);
     assertSpyCalls(effectA, 2);
 
@@ -182,14 +186,16 @@ describe("memo", () => {
 
   it("should use fallback if error is thrown during init", () => {
     createRoot(() => {
-      onError(() => {});
+      let $a: Accessor<string>;
 
-      const $a = createMemo(() => {
-        if (1) throw Error();
-        return "";
-      }, "foo");
+      catchError(() => {
+        $a = createMemo(() => {
+          if (1) throw Error();
+          return "";
+        }, "foo");
+      }, console.log);
 
-      assertStrictEquals($a(), "foo");
+      assertStrictEquals($a!(), "foo");
     });
   });
 });

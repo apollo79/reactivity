@@ -1,5 +1,6 @@
 import { runWithOwner } from "~/utils/runWithOwner.ts";
 import { Scope } from "~/objects/scope.ts";
+import { ERRORTHROWN_SYMBOL } from "../context.ts";
 
 export type RootFunction<T> = (dispose: () => void) => T;
 
@@ -20,6 +21,11 @@ export class Root<T = unknown> extends Scope {
    * Executes the provided callback with the root as scope
    */
   wrap(): T {
-    return runWithOwner(() => this.fn(this.dispose.bind(this)), this, false)!;
+    const result = runWithOwner(
+      () => this.fn(this.dispose.bind(this)),
+      this,
+      false,
+    );
+    return result === ERRORTHROWN_SYMBOL ? undefined! : result;
   }
 }
