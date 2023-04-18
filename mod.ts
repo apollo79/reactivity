@@ -28,5 +28,5 @@ export function runWithOwner<T>(fn: () => T, owner: typeof CURRENTOWNER) {
 export type { Owner } from "~/objects/owner.ts";
 export type { Accessor, Setter } from "~/objects/observable.ts";
 export type { Signal, SignalOptions } from "~/methods/createSignal.ts";
-export type { Computation } from "~/objects/computation.ts";
+export type { Observer } from "~/objects/observer.ts";
 export type { EffectFunction, EffectOptions } from "~/methods/createEffect.ts";

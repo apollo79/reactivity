@@ -1,8 +1,5 @@
 import { CacheState, ERRORTHROWN_SYMBOL, STATE_CHECK } from "~/context.ts";
-import {
-  Computation,
-  type ComputationFunction,
-} from "~/objects/computation.ts";
+import { Observer, type ObserverFunction } from "~/objects/observer.ts";
 import { Observable } from "~/objects/observable.ts";
 import type { ObservableOptions } from "~/objects/observable.ts";
 
@@ -11,11 +8,11 @@ export type MemoOptions<T> = ObservableOptions<T>;
 /**
  * A memo is a computation that stores the last return value of its execution as observable so it can be depended on
  */
-export class Memo<T> extends Computation<T> {
+export class Memo<T> extends Observer<T> {
   prevValue: Observable<T>;
 
   constructor(
-    fn: ComputationFunction<undefined | T, T>,
+    fn: ObserverFunction<undefined | T, T>,
     init?: T,
     options?: MemoOptions<T>,
   ) {

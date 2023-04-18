@@ -6,10 +6,10 @@ import {
   SyncScheduler,
 } from "~/scheduler.ts";
 import { Effect } from "~/objects/effect.ts";
-import { Computation } from "../mod.ts";
+import { Observer } from "../mod.ts";
 
 let CURRENTOWNER: Owner | undefined;
-let CURRENTOBSERVER: Computation<any> | undefined;
+let CURRENTOBSERVER: Observer<any> | undefined;
 let SCHEDULER: Scheduler = new SyncScheduler();
 let BATCH: Effect<any>[] | undefined;
 

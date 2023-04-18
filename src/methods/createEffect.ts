@@ -1,12 +1,12 @@
-import { type ComputationFunction } from "~/objects/computation.ts";
+import { type ObserverFunction } from "~/objects/observer.ts";
 import type { ObservableOptions } from "~/objects/observable.ts";
 import { NoInfer } from "~/context.ts";
 import { Effect } from "~/objects/effect.ts";
 
-export type EffectFunction<
+export type EffectFunction<Prev, Next extends Prev = Prev> = ObserverFunction<
   Prev,
-  Next extends Prev = Prev,
-> = ComputationFunction<Prev, Next>;
+  Next
+>;
 
 export type EffectOptions<T> = ObservableOptions<T>;
 

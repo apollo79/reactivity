@@ -4,19 +4,16 @@ import {
   SCHEDULER,
   STATE_CLEAN,
 } from "~/context.ts";
-import {
-  Computation,
-  type ComputationFunction,
-} from "~/objects/computation.ts";
+import { Observer, type ObserverFunction } from "~/objects/observer.ts";
 
 /**
  * An effect is executed immediately on creation and every time again when one of its dependencies changes
  */
-export class Effect<T> extends Computation<T> {
+export class Effect<T> extends Observer<T> {
   /** Stores the last return value of the callback */
   prevValue: T | undefined;
 
-  constructor(fn: ComputationFunction<undefined | T, T>, init?: T) {
+  constructor(fn: ObserverFunction<undefined | T, T>, init?: T) {
     super(fn);
 
     this.prevValue = init;

@@ -1,9 +1,8 @@
-import { Computation } from "~/objects/computation.ts";
+import { Observer } from "~/objects/observer.ts";
 import {
   BATCH,
   type CacheState,
   CURRENTOBSERVER,
-  CURRENTOWNER,
   SCHEDULER,
   STATE_DIRTY,
   STATE_DISPOSED,
@@ -31,7 +30,7 @@ export class Observable<T = unknown> {
    */
   parent: Memo<T> | null = null;
   /** One part of the double-linked list between computations and observables. It holds all computations that observe this observable. */
-  observers = new Set<Computation<any>>();
+  observers = new Set<Observer<any>>();
   value: T;
   // the function to compare nextValue to the current value
   equals: EqualsFunction<T>;
@@ -81,7 +80,9 @@ export class Observable<T = unknown> {
    * @returns The new value
    */
   write(value: T | UpdateFunction<T>): T {
-    const nextValue = value instanceof Function ? value(this.value) : value;
+    const nextValue = typeof value === "function"
+      ? (value as UpdateFunction<T>)(this.value)
+      : value;
 
     // check if the new value is actually different than the old one
     if (!this.equals(this.value, nextValue)) {

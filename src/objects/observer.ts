@@ -8,19 +8,19 @@ import {
 import { Owner } from "~/objects/owner.ts";
 import { type Observable } from "~/objects/observable.ts";
 
-export type ComputationFunction<Prev, Next extends Prev = Prev> = (
+export type ObserverFunction<Prev, Next extends Prev = Prev> = (
   prevValue: Prev,
 ) => Next;
 
 /**
  * A computation is a scope and the abstraction over effects and memos.
  */
-export abstract class Computation<T> extends Owner {
+export abstract class Observer<T> extends Owner {
   /** One part of the double-linked list between observables and computations. It holds all observables that this computation depends on. */
   readonly sources = new Set<Observable<any>>();
-  readonly fn: ComputationFunction<undefined | T, T>;
+  readonly fn: ObserverFunction<undefined | T, T>;
 
-  constructor(fn: ComputationFunction<undefined | T, T>) {
+  constructor(fn: ObserverFunction<undefined | T, T>) {
     super();
     this.fn = fn;
     // Register under the parent scope for the parent's disposal
