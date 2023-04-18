@@ -3,7 +3,7 @@ import {
   createRoot,
   getContext,
   getOwner,
-  type Scope,
+  type Owner,
   setContext,
 } from "#/mod.ts";
 import { assertStrictEquals, describe, it } from "./util.ts";
@@ -36,7 +36,7 @@ describe("context", () => {
   });
 
   it("should use provided scope", () => {
-    let scope!: Scope;
+    let scope!: Owner;
     const key = Symbol();
 
     createRoot(() => {

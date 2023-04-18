@@ -1,6 +1,6 @@
 import { CONTEXT } from "~/context.ts";
-import type { Scope } from "~/objects/scope.ts";
+import type { Owner } from "~/objects/owner.ts";
 
-export function getOwner(): Scope | null {
-  return CONTEXT.CURRENTSCOPE;
+export function getOwner(): Owner | null {
+  return CONTEXT.CURRENTOWNER;
 }

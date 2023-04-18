@@ -3,11 +3,11 @@ import { CONTEXT } from "~/context.ts";
 export type CleanupFunction = () => void;
 
 export function onDispose(fn: CleanupFunction) {
-  if (!CONTEXT.CURRENTSCOPE) {
+  if (!CONTEXT.CURRENTOWNER) {
     return () => {};
   }
 
-  const owner = CONTEXT.CURRENTSCOPE;
+  const owner = CONTEXT.CURRENTOWNER;
 
   owner?.disposal.push(fn);
 

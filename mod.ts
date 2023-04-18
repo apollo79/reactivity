@@ -14,7 +14,7 @@ export { catchError } from "~/methods/catchError.ts";
 export { tick } from "~/methods/tick.ts";
 export { setScheduling } from "~/context.ts";
 
-export type { Scope } from "~/objects/scope.ts";
+export type { Owner } from "~/objects/owner.ts";
 export type { Accessor, Setter } from "~/objects/observable.ts";
 export type { Signal, SignalOptions } from "~/methods/createSignal.ts";
 export type { Computation } from "~/objects/computation.ts";

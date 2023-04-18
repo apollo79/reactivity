@@ -5,7 +5,7 @@ import { castError } from "./castError.ts";
 export function handleError(thrown: unknown) {
   const error = castError(thrown);
 
-  const errorHandler = CONTEXT.CURRENTSCOPE?.get<ErrorFunction>(
+  const errorHandler = CONTEXT.CURRENTOWNER?.get<ErrorFunction>(
     ERRORHANDLER_SYMBOL,
   );
 

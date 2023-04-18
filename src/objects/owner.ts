@@ -9,17 +9,17 @@ import type { CleanupFunction } from "~/methods/onDispose.ts";
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
  */
-export class Scope {
+export class Owner {
   /**
    * The scope gets registered under its parent scope for.
    * This is needed for the parent's disposal and contexts as well as errors as they bubble up
    */
-  readonly parentScope: Scope | null = CONTEXT.CURRENTSCOPE;
+  readonly parentScope: Owner | null = CONTEXT.CURRENTOWNER;
   /**
    * Scopes that are created under this scope.
    * This isneeded so when this scope is disposed, it can tell its children scopes to dispose themselves too
    */
-  readonly childrenScopes = new Set<Scope>();
+  readonly childrenScopes = new Set<Owner>();
   /** Custom cleanup functions */
   disposal: CleanupFunction[] = [];
   /**

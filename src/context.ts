@@ -1,4 +1,4 @@
-import type { Scope } from "~/objects/scope.ts";
+import type { Owner } from "~/objects/owner.ts";
 import {
   AsyncScheduler,
   ScheduleMethod,
@@ -8,14 +8,14 @@ import {
 import { Effect } from "./objects/effect.ts";
 
 type Context = {
-  CURRENTSCOPE: Scope | null;
+  CURRENTOWNER: Owner | null;
   TRACKING: boolean;
   SCHEDULER: Scheduler;
   BATCH: Effect<any>[] | null;
 };
 
 export const CONTEXT: Context = {
-  CURRENTSCOPE: null,
+  CURRENTOWNER: null,
   TRACKING: false,
   SCHEDULER: new SyncScheduler(),
   BATCH: null,

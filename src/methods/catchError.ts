@@ -1,11 +1,11 @@
 import { ERRORHANDLER_SYMBOL } from "~/context.ts";
-import { Scope } from "~/objects/scope.ts";
+import { Owner } from "~/objects/owner.ts";
 import { runWithOwner } from "~/utils/runWithOwner.ts";
 
 export type ErrorFunction = (error: Error) => void;
 
 export function catchError(tryFn: () => void, handler: ErrorFunction) {
-  const scope = new Scope();
+  const scope = new Owner();
 
   scope.contexts[ERRORHANDLER_SYMBOL] = handler;
 

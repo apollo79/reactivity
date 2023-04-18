@@ -1,16 +1,16 @@
 import { CONTEXT, ERRORTHROWN_SYMBOL } from "~/context.ts";
-import type { Scope } from "~/objects/scope.ts";
+import type { Owner } from "~/objects/owner.ts";
 import { handleError } from "~/utils/handleError.ts";
 
 export function runWithOwner<T>(
   fn: () => T,
-  owner: Scope | null,
+  owner: Owner | null,
   tracking = true,
 ): T | typeof ERRORTHROWN_SYMBOL {
-  const PREV_OBSERVER = CONTEXT.CURRENTSCOPE;
+  const PREV_OBSERVER = CONTEXT.CURRENTOWNER;
   const PREV_TRACKING = CONTEXT.TRACKING;
 
-  CONTEXT.CURRENTSCOPE = owner;
+  CONTEXT.CURRENTOWNER = owner;
   CONTEXT.TRACKING = tracking;
 
   try {
@@ -20,7 +20,7 @@ export function runWithOwner<T>(
 
     return ERRORTHROWN_SYMBOL;
   } finally {
-    CONTEXT.CURRENTSCOPE = PREV_OBSERVER;
+    CONTEXT.CURRENTOWNER = PREV_OBSERVER;
     CONTEXT.TRACKING = PREV_TRACKING;
   }
 }

@@ -2,21 +2,15 @@ import {
   createRoot,
   getContext,
   getOwner,
+  type Owner,
   runWithOwner,
-  type Scope,
   setContext,
 } from "#/mod.ts";
-import {
-  assertSpyCallArg,
-  assertStrictEquals,
-  describe,
-  it,
-  spy,
-} from "./util.ts";
+import { assertStrictEquals, describe, it } from "./util.ts";
 
 describe("runWithOwner", () => {
   it("should scope function to current scope", () => {
-    let scope!: Scope | null;
+    let scope!: Owner | null;
     createRoot(() => {
       scope = getOwner();
       setContext("id", 10);

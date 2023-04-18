@@ -1,5 +1,5 @@
 import { runWithOwner } from "~/utils/runWithOwner.ts";
-import { Scope } from "~/objects/scope.ts";
+import { Owner } from "~/objects/owner.ts";
 import { ERRORTHROWN_SYMBOL } from "../context.ts";
 
 export type RootFunction<T> = (dispose: () => void) => T;
@@ -9,7 +9,7 @@ export type RootFunction<T> = (dispose: () => void) => T;
  * A root, in contrast to a computation, doesn't link itself with its parent, meaning it isn't automatically disposed if the parent disposes
  * Anyway it needs to know about its parent for getting context from it
  */
-export class Root<T = unknown> extends Scope {
+export class Root<T = unknown> extends Owner {
   fn: RootFunction<T>;
 
   constructor(fn: RootFunction<T>) {
@@ -26,6 +26,7 @@ export class Root<T = unknown> extends Scope {
       this,
       false,
     );
+
     return result === ERRORTHROWN_SYMBOL ? undefined! : result;
   }
 }

@@ -6,7 +6,7 @@ import {
   STATE_DIRTY,
 } from "~/context.ts";
 import { runWithOwner } from "~/utils/runWithOwner.ts";
-import { Scope } from "~/objects/scope.ts";
+import { Owner } from "~/objects/owner.ts";
 import { type Observable } from "~/objects/observable.ts";
 
 export type ComputationFunction<Prev, Next extends Prev = Prev> = (
@@ -16,7 +16,7 @@ export type ComputationFunction<Prev, Next extends Prev = Prev> = (
 /**
  * A computation is a scope and the abstraction over effects and memos.
  */
-export abstract class Computation<T> extends Scope {
+export abstract class Computation<T> extends Owner {
   /** One part of the double-linked list between observables and computations. It holds all observables that this computation depends on. */
   readonly sources = new Set<Observable>();
   readonly fn: ComputationFunction<undefined | T, T>;
@@ -96,7 +96,7 @@ export abstract class Computation<T> extends Scope {
    * @returns {boolean}
    */
   isZombie() {
-    let owner: Scope | null = this.parentScope;
+    let owner: Owner | null = this.parentScope;
 
     // loop up the tree
     while (owner !== null) {
