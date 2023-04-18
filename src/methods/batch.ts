@@ -7,6 +7,6 @@ export function batch(fn: () => void): void {
 
     SCHEDULER.runEffects();
   } finally {
-    setBatch(null);
+    setBatch(undefined);
   }
 }

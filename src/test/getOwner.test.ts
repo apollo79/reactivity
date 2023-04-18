@@ -10,7 +10,7 @@ import {
 describe("getOwner", () => {
   it("should return the owner of the current computation", () => {
     const nullOwner = getOwner();
-    assertStrictEquals(nullOwner, null);
+    assertStrictEquals(nullOwner, undefined);
 
     createRoot(() => {
       const outerOwner = getOwner();

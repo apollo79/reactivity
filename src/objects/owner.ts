@@ -1,20 +1,53 @@
 import {
   type CacheState,
+  CURRENTOBSERVER,
   CURRENTOWNER,
+  ERRORTHROWN_SYMBOL,
+  setObserver,
+  setOwner,
   STATE_CLEAN,
   STATE_DISPOSED,
 } from "~/context.ts";
 import type { CleanupFunction } from "~/methods/onDispose.ts";
+import { handleError } from "~/utils/handleError.ts";
+import { Computation } from "../../mod.ts";
 
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
  */
 export class Owner {
+  static getOwner(): Owner | undefined {
+    return CURRENTOWNER;
+  }
+
+  static runWithOwner<T>(
+    fn: () => T,
+    owner: typeof CURRENTOWNER,
+    observer: typeof CURRENTOBSERVER,
+  ): T | typeof ERRORTHROWN_SYMBOL {
+    const PREV_OWNER = CURRENTOWNER;
+    const PREV_OBSERVER = CURRENTOBSERVER;
+
+    setOwner(owner);
+    setObserver(observer);
+
+    try {
+      return fn();
+    } catch (error: unknown) {
+      handleError(error);
+
+      return ERRORTHROWN_SYMBOL;
+    } finally {
+      setOwner(PREV_OWNER);
+      setObserver(PREV_OBSERVER);
+    }
+  }
+
   /**
    * The scope gets registered under its parent scope for.
    * This is needed for the parent's disposal and contexts as well as errors as they bubble up
    */
-  readonly parentScope: Owner | null = CURRENTOWNER;
+  readonly parentScope: Owner | undefined = CURRENTOWNER;
   /**
    * Scopes that are created under this scope.
    * This isneeded so when this scope is disposed, it can tell its children scopes to dispose themselves too

@@ -4,9 +4,9 @@ import { Owner } from "~/objects/owner.ts";
 export function setContext<T>(
   id: string | symbol,
   value: T,
-  scope: Owner | null = CURRENTOWNER,
+  scope: Owner | undefined = CURRENTOWNER,
 ): void {
-  if (scope === null) {
+  if (!scope) {
     return;
   }
 

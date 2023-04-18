@@ -6,27 +6,28 @@ import {
   SyncScheduler,
 } from "~/scheduler.ts";
 import { Effect } from "~/objects/effect.ts";
+import { Computation } from "../mod.ts";
 
-let CURRENTOWNER: Owner | null = null;
-let TRACKING = false;
+let CURRENTOWNER: Owner | undefined;
+let CURRENTOBSERVER: Computation<any> | undefined;
 let SCHEDULER: Scheduler = new SyncScheduler();
-let BATCH: Effect<any>[] | null = null;
+let BATCH: Effect<any>[] | undefined;
 
-export { BATCH, CURRENTOWNER, SCHEDULER, TRACKING };
+export { BATCH, CURRENTOBSERVER, CURRENTOWNER, SCHEDULER };
 
-function setCurrentOwner(owner: typeof CURRENTOWNER) {
+function setOwner(owner: typeof CURRENTOWNER) {
   CURRENTOWNER = owner;
 }
 
-function setTracking(tracking: boolean) {
-  TRACKING = tracking;
+function setObserver(observer: typeof CURRENTOBSERVER) {
+  CURRENTOBSERVER = observer;
 }
 
 function setBatch(batch: typeof BATCH) {
   BATCH = batch;
 }
 
-export { setBatch, setCurrentOwner, setTracking };
+export { setBatch, setObserver, setOwner };
 
 export function setScheduling(scheduleMethod: ScheduleMethod) {
   if (SCHEDULER.method === scheduleMethod) {

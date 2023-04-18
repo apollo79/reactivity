@@ -2,11 +2,11 @@ import { Computation } from "~/objects/computation.ts";
 import {
   BATCH,
   type CacheState,
+  CURRENTOBSERVER,
   CURRENTOWNER,
   SCHEDULER,
   STATE_DIRTY,
   STATE_DISPOSED,
-  TRACKING,
 } from "~/context.ts";
 import { Memo } from "~/objects/memo.ts";
 
@@ -47,14 +47,14 @@ export class Observable<T = unknown> {
    * Stores dependencies between observables and computations in a double-linked list
    */
   #subscribe() {
-    const running = CURRENTOWNER;
+    const running = CURRENTOBSERVER;
 
-    if (TRACKING && running instanceof Computation) {
+    if (running) {
       // store the computation in our part of the list
       this.observers.add(running);
 
       // store us in the computation's part of the list
-      running.sources.add(this as Observable<unknown>);
+      running.sources.add(this);
     }
   }
 

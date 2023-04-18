@@ -1,4 +1,3 @@
-import { runWithOwner } from "~/utils/runWithOwner.ts";
 import { Owner } from "~/objects/owner.ts";
 import { ERRORTHROWN_SYMBOL } from "../context.ts";
 
@@ -21,10 +20,10 @@ export class Root<T = unknown> extends Owner {
    * Executes the provided callback with the root as scope
    */
   wrap(): T {
-    const result = runWithOwner(
+    const result = Owner.runWithOwner(
       () => this.fn(this.dispose.bind(this)),
       this,
-      false,
+      undefined,
     );
 
     return result === ERRORTHROWN_SYMBOL ? undefined! : result;

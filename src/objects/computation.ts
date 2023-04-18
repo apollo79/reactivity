@@ -5,7 +5,6 @@ import {
   STATE_CLEAN,
   STATE_DIRTY,
 } from "~/context.ts";
-import { runWithOwner } from "~/utils/runWithOwner.ts";
 import { Owner } from "~/objects/owner.ts";
 import { type Observable } from "~/objects/observable.ts";
 
@@ -18,7 +17,7 @@ export type ComputationFunction<Prev, Next extends Prev = Prev> = (
  */
 export abstract class Computation<T> extends Owner {
   /** One part of the double-linked list between observables and computations. It holds all observables that this computation depends on. */
-  readonly sources = new Set<Observable>();
+  readonly sources = new Set<Observable<any>>();
   readonly fn: ComputationFunction<undefined | T, T>;
 
   constructor(fn: ComputationFunction<undefined | T, T>) {
@@ -55,7 +54,7 @@ export abstract class Computation<T> extends Owner {
 
     this.parentScope?.childrenScopes.add(this);
 
-    const result = runWithOwner(() => this.fn(prevValue), this, true);
+    const result = Owner.runWithOwner(() => this.fn(prevValue), this, this);
 
     this.state = STATE_CLEAN;
 

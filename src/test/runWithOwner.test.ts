@@ -10,7 +10,8 @@ import { assertStrictEquals, describe, it } from "./util.ts";
 
 describe("runWithOwner", () => {
   it("should scope function to current scope", () => {
-    let scope!: Owner | null;
+    let scope!: Owner | undefined;
+
     createRoot(() => {
       scope = getOwner();
       setContext("id", 10);
@@ -21,7 +22,7 @@ describe("runWithOwner", () => {
 
   it("should return value", () => {
     assertStrictEquals(
-      runWithOwner(() => 100, null),
+      runWithOwner(() => 100, undefined),
       100,
     );
   });
