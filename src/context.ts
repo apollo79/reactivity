@@ -4,25 +4,32 @@ import {
   ScheduleMethod,
   Scheduler,
   SyncScheduler,
-} from "./scheduler.ts";
-import { Effect } from "./objects/effect.ts";
+} from "~/scheduler.ts";
+import { Effect } from "~/objects/effect.ts";
 
-type Context = {
-  CURRENTOWNER: Owner | null;
-  TRACKING: boolean;
-  SCHEDULER: Scheduler;
-  BATCH: Effect<any>[] | null;
-};
+let CURRENTOWNER: Owner | null = null;
+let TRACKING = false;
+let SCHEDULER: Scheduler = new SyncScheduler();
+let BATCH: Effect<any>[] | null = null;
 
-export const CONTEXT: Context = {
-  CURRENTOWNER: null,
-  TRACKING: false,
-  SCHEDULER: new SyncScheduler(),
-  BATCH: null,
-};
+export { BATCH, CURRENTOWNER, SCHEDULER, TRACKING };
+
+function setCurrentOwner(owner: typeof CURRENTOWNER) {
+  CURRENTOWNER = owner;
+}
+
+function setTracking(tracking: boolean) {
+  TRACKING = tracking;
+}
+
+function setBatch(batch: typeof BATCH) {
+  BATCH = batch;
+}
+
+export { setBatch, setCurrentOwner, setTracking };
 
 export function setScheduling(scheduleMethod: ScheduleMethod) {
-  if (CONTEXT.SCHEDULER.method === scheduleMethod) {
+  if (SCHEDULER.method === scheduleMethod) {
     return;
   }
 
@@ -30,7 +37,7 @@ export function setScheduling(scheduleMethod: ScheduleMethod) {
     ? SyncScheduler
     : AsyncScheduler;
 
-  CONTEXT.SCHEDULER = new NewScheduler();
+  SCHEDULER = new NewScheduler();
 }
 
 export const STATE_CLEAN = 1;

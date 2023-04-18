@@ -1,7 +1,7 @@
 import type { EffectFunction } from "~/methods/createEffect.ts";
 import type { Accessor } from "~/objects/observable.ts";
-import type { NoInfer } from "../context.ts";
-import { Memo, type MemoOptions } from "../objects/memo.ts";
+import type { NoInfer } from "~/context.ts";
+import { Memo, type MemoOptions } from "~/objects/memo.ts";
 
 export function createMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | NoInfer<Prev>, Next>,

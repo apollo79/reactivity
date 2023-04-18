@@ -1,7 +1,10 @@
 import { CacheState, ERRORTHROWN_SYMBOL, STATE_CHECK } from "~/context.ts";
-import { Computation, ComputationFunction } from "./computation.ts";
-import { Observable } from "./observable.ts";
-import type { ObservableOptions } from "./observable.ts";
+import {
+  Computation,
+  type ComputationFunction,
+} from "~/objects/computation.ts";
+import { Observable } from "~/objects/observable.ts";
+import type { ObservableOptions } from "~/objects/observable.ts";
 
 export type MemoOptions<T> = ObservableOptions<T>;
 

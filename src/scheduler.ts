@@ -1,5 +1,5 @@
-import { STATE_CLEAN } from "./context.ts";
-import { Effect } from "./objects/effect.ts";
+import { STATE_CLEAN } from "~/context.ts";
+import { Effect } from "~/objects/effect.ts";
 
 export type ScheduleMethod = "sync" | "async";
 

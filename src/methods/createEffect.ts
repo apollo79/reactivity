@@ -1,7 +1,7 @@
 import { type ComputationFunction } from "~/objects/computation.ts";
 import type { ObservableOptions } from "~/objects/observable.ts";
-import { NoInfer } from "../context.ts";
-import { Effect } from "../objects/effect.ts";
+import { NoInfer } from "~/context.ts";
+import { Effect } from "~/objects/effect.ts";
 
 export type EffectFunction<
   Prev,

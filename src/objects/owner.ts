@@ -1,6 +1,6 @@
 import {
   type CacheState,
-  CONTEXT,
+  CURRENTOWNER,
   STATE_CLEAN,
   STATE_DISPOSED,
 } from "~/context.ts";
@@ -14,7 +14,7 @@ export class Owner {
    * The scope gets registered under its parent scope for.
    * This is needed for the parent's disposal and contexts as well as errors as they bubble up
    */
-  readonly parentScope: Owner | null = CONTEXT.CURRENTOWNER;
+  readonly parentScope: Owner | null = CURRENTOWNER;
   /**
    * Scopes that are created under this scope.
    * This isneeded so when this scope is disposed, it can tell its children scopes to dispose themselves too

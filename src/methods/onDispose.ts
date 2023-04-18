@@ -1,13 +1,13 @@
-import { CONTEXT } from "~/context.ts";
+import { CURRENTOWNER } from "~/context.ts";
 
 export type CleanupFunction = () => void;
 
 export function onDispose(fn: CleanupFunction) {
-  if (!CONTEXT.CURRENTOWNER) {
+  if (!CURRENTOWNER) {
     return () => {};
   }
 
-  const owner = CONTEXT.CURRENTOWNER;
+  const owner = CURRENTOWNER;
 
   owner?.disposal.push(fn);
 

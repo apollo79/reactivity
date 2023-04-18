@@ -1,7 +1,7 @@
 import type { Accessor } from "~/objects/observable.ts";
 import type { EffectFunction } from "~/methods/createEffect.ts";
 import { untrack } from "~/methods/untrack.ts";
-import { NoInfer } from "../context.ts";
+import type { NoInfer } from "~/context.ts";
 
 // transforms a tuple to a tuple of accessors in a way that allows generics to be inferred
 export type AccessorArray<T> = [

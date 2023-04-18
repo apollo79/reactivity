@@ -1,11 +1,14 @@
 import { Computation } from "~/objects/computation.ts";
 import {
+  BATCH,
   type CacheState,
-  CONTEXT,
+  CURRENTOWNER,
+  SCHEDULER,
   STATE_DIRTY,
   STATE_DISPOSED,
+  TRACKING,
 } from "~/context.ts";
-import { Memo } from "./memo.ts";
+import { Memo } from "~/objects/memo.ts";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T | UpdateFunction<T>) => T;
@@ -44,9 +47,9 @@ export class Observable<T = unknown> {
    * Stores dependencies between observables and computations in a double-linked list
    */
   #subscribe() {
-    const running = CONTEXT.CURRENTOWNER;
+    const running = CURRENTOWNER;
 
-    if (CONTEXT.TRACKING && running instanceof Computation) {
+    if (TRACKING && running instanceof Computation) {
       // store the computation in our part of the list
       this.observers.add(running);
 
@@ -87,8 +90,8 @@ export class Observable<T = unknown> {
       // notify computations about the new value
       this.stale(STATE_DIRTY);
 
-      if (!CONTEXT.BATCH) {
-        CONTEXT.SCHEDULER.flush();
+      if (!BATCH) {
+        SCHEDULER.flush();
       }
     }
 

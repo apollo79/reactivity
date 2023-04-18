@@ -1,10 +1,13 @@
 import {
   CacheState,
-  CONTEXT,
   ERRORTHROWN_SYMBOL,
+  SCHEDULER,
   STATE_CLEAN,
 } from "~/context.ts";
-import { Computation, ComputationFunction } from "./computation.ts";
+import {
+  Computation,
+  type ComputationFunction,
+} from "~/objects/computation.ts";
 
 /**
  * An effect is executed immediately on creation and every time again when one of its dependencies changes
@@ -43,7 +46,7 @@ export class Effect<T> extends Computation<T> {
     }
 
     if (this.state === STATE_CLEAN) {
-      CONTEXT.SCHEDULER.enqueue(this);
+      SCHEDULER.enqueue(this);
     }
 
     this.state = newState;

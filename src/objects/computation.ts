@@ -90,23 +90,4 @@ export abstract class Computation<T> extends Owner {
   }
 
   abstract stale(newState: CacheState): void;
-
-  /**
-   * Checks if this scope is the ancestor of a dirty scope
-   * @returns {boolean}
-   */
-  isZombie() {
-    let owner: Owner | null = this.parentScope;
-
-    // loop up the tree
-    while (owner !== null) {
-      if (owner instanceof Computation && owner.state === STATE_DIRTY) {
-        return true;
-      }
-
-      owner = owner.parentScope;
-    }
-
-    return false;
-  }
 }

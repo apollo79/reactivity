@@ -1,12 +1,12 @@
-import { CONTEXT } from "../context.ts";
+import { SCHEDULER, setBatch } from "~/context.ts";
 
 export function batch(fn: () => void): void {
-  CONTEXT.BATCH = [];
+  setBatch([]);
   try {
     fn();
 
-    CONTEXT.SCHEDULER.runEffects();
+    SCHEDULER.runEffects();
   } finally {
-    CONTEXT.BATCH = null;
+    setBatch(null);
   }
 }
