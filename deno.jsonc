@@ -1,8 +1,6 @@
 {
   "fmt": {
-    "options": {
-      "indentWidth": 2
-    }
+    "indentWidth": 2
   },
   "tasks": {
     "test": "deno test --parallel --coverage=cov_profile",

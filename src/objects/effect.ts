@@ -17,6 +17,8 @@ export class Effect<T> extends Observer<T> {
     super(fn);
 
     this.prevValue = init;
+
+    this.update();
   }
 
   /**

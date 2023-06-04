@@ -10,7 +10,6 @@ import {
 } from "~/context.ts";
 import type { CleanupFunction } from "~/methods/onDispose.ts";
 import { handleError } from "~/utils/handleError.ts";
-import { Observer } from "../../mod.ts";
 
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
