@@ -1,4 +1,5 @@
 import { createSignal } from "~/methods/createSignal.ts";
+import { CURRENTOBSERVER } from "../context.ts";
 
 const $PROXY = Symbol("Proxy");
 const $NODE = Symbol("DataNodes");
@@ -33,18 +34,9 @@ interface StoreNode {
   [key: PropertyKey]: any;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type NotWrappable =
-  | string
-  | number
-  | bigint
-  | boolean
-  | symbol
-  | Function
-  | null
-  | undefined;
+export type Wrappable = Record<string | number | symbol, any>;
 
-export function isWrappable<T>(value: T | NotWrappable): value is T {
+export function isWrappable(value: unknown): value is Wrappable {
   if (value === null || typeof value !== "object") {
     return false;
   }
@@ -55,20 +47,21 @@ export function isWrappable<T>(value: T | NotWrappable): value is T {
 
   // if (SYMBOL_STORE_UNTRACKED in value) return false;
 
-  // if (isArray(value)) return true;
+  // TODO: support for arrays (length property has some tricky parts!)
+  if (Array.isArray(value)) return false;
 
-  const prototype = Object.getPrototypeOf(value);
+  const prototype = Reflect.getPrototypeOf(value);
 
   if (prototype === null) return true;
 
-  return Object.getPrototypeOf(prototype) === null;
+  return Reflect.getPrototypeOf(prototype) === null;
 }
 
 function getDataNodes(target: StoreNode): DataNodes {
   let nodes = target[$NODE];
 
   if (!nodes) {
-    nodes = Object.create(null);
+    nodes = {};
     Reflect.defineProperty(target, $NODE, { value: nodes as DataNodes });
   }
 
@@ -99,42 +92,98 @@ const proxyTraps: ProxyHandler<any> = {
 
     const nodes = getDataNodes(target);
 
-    const trackedProp = nodes[property];
+    const isTracked = nodes.hasOwnProperty(property);
+    let value = isTracked ? nodes[property]!() : target[property];
 
     if (UNREACTIVE_KEYS.has(property)) {
-      return target[property];
+      return value;
     }
 
-    const value = trackedProp
-      ? trackedProp()
-      : getDataNode(nodes, property, target[property])();
+    if (!isTracked) {
+      const descriptor = Object.getOwnPropertyDescriptor(target, property);
+      if (
+        CURRENTOBSERVER &&
+        (typeof value !== "function" || target.hasOwnProperty(property)) &&
+        !(descriptor && descriptor.get)
+      ) {
+        value = getDataNode(nodes, property, value)();
+      }
+    }
 
     return isWrappable(value) ? wrap(value) : value;
   },
+  set() {
+    console.warn("Cannot mutate a store directly!");
+    return true;
+  },
+  deleteProperty() {
+    console.warn("Cannot mutate a Store directly");
+    return true;
+  },
 };
 
-function setPath(current: StoreNode, path: [...string[], any]): void {
+function setProperty(current: StoreNode, property: PropertyKey, value: any) {
+  if (value === undefined) {
+    delete current[property];
+  } else {
+    const prevValue = current[property];
+    current[property] = value;
+
+    const node = getDataNode(getDataNodes(current), property, prevValue);
+
+    node.set(() => value);
+  }
+}
+
+function setPath(
+  current: StoreNode,
+  path: [...string[], any],
+  traversed?: string[],
+): void {
   const part = path.shift();
+  traversed ??= [];
 
-  if (path.length === 1) {
-    const prev = current[part];
-    let newValue = path[0];
+  if (path.length <= 1) {
+    let prevValue;
+    let newValue;
 
-    if (typeof newValue === "function") {
-      newValue = newValue(prev);
+    // when setting a property
+    if (path.length === 1) {
+      prevValue = current[part];
+      newValue = path.shift();
+      traversed = [...traversed, part];
+    } 
+    // when doing a top level merge
+    else {
+      prevValue = current;
+      newValue = part;
     }
 
-    if (prev === newValue) {
+    newValue = typeof newValue === "function"
+      ? newValue(prevValue, traversed)
+      : newValue;
+
+    if (prevValue === newValue) {
       return;
     }
 
-    const node = getDataNode(getDataNodes(current), part);
+    if (isWrappable(prevValue) && isWrappable(newValue)) {
+      const keys = Object.keys(newValue);
 
-    node.set(path[0]);
+      // merge the new value with the previous value by setting each property by itself
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
 
-    return;
+        setProperty(prevValue, key, newValue[key]);
+      }
+
+      return;
+    }
+
+    // prevent that if newValue is a function it gets executed as setter function
+    setProperty(current, part, newValue);
   } else {
-    setPath(current[part], path);
+    setPath(current[part], path, [...traversed, part]);
   }
 }
 
