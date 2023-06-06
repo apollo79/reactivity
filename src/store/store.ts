@@ -48,7 +48,7 @@ export function isWrappable(value: unknown): value is Wrappable {
   // if (SYMBOL_STORE_UNTRACKED in value) return false;
 
   // TODO: support for arrays (length property has some tricky parts!)
-  if (Array.isArray(value)) return false;
+  if (Array.isArray(value)) return true;
 
   const prototype = Reflect.getPrototypeOf(value);
 
@@ -62,10 +62,10 @@ function getDataNodes(target: StoreNode): DataNodes {
 
   if (!nodes) {
     nodes = {};
-    Reflect.defineProperty(target, $NODE, { value: nodes as DataNodes });
+    Reflect.defineProperty(target, $NODE, { value: nodes });
   }
 
-  return nodes as DataNodes;
+  return nodes;
 }
 
 function getDataNode(
@@ -86,7 +86,7 @@ function getDataNode(
   return node;
 }
 
-const proxyTraps: ProxyHandler<any> = {
+const proxyTraps: ProxyHandler<StoreNode> = {
   get(target, property, receiver) {
     if (property === $PROXY) return receiver;
 
@@ -123,6 +123,8 @@ const proxyTraps: ProxyHandler<any> = {
 };
 
 function setProperty(current: StoreNode, property: PropertyKey, value: any) {
+  // const prevLength = current[property].length;
+
   if (value === undefined) {
     delete current[property];
   } else {
@@ -131,70 +133,128 @@ function setProperty(current: StoreNode, property: PropertyKey, value: any) {
 
     const node = getDataNode(getDataNodes(current), property, prevValue);
 
+    // prevent that if value is a function it gets executed as setter function
     node.set(() => value);
   }
 }
 
-function setPath(
-  current: StoreNode,
-  path: [...string[], any],
-  traversed?: string[],
-): void {
-  const part = path.shift();
-  traversed ??= [];
+function mergeStoreNode(current: StoreNode, next: StoreNode) {
+  const keys = Object.keys(next);
 
-  if (path.length <= 1) {
-    let prevValue;
-    let newValue;
+  // merge the new value with the previous value by setting each property by itself
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
 
-    // when setting a property
-    if (path.length === 1) {
-      prevValue = current[part];
-      newValue = path.shift();
-      traversed = [...traversed, part];
-    } 
-    // when doing a top level merge
-    else {
-      prevValue = current;
-      newValue = part;
-    }
-
-    newValue = typeof newValue === "function"
-      ? newValue(prevValue, traversed)
-      : newValue;
-
-    if (prevValue === newValue) {
-      return;
-    }
-
-    if (isWrappable(prevValue) && isWrappable(newValue)) {
-      const keys = Object.keys(newValue);
-
-      // merge the new value with the previous value by setting each property by itself
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-
-        setProperty(prevValue, key, newValue[key]);
-      }
-
-      return;
-    }
-
-    // prevent that if newValue is a function it gets executed as setter function
-    setProperty(current, part, newValue);
-  } else {
-    setPath(current[part], path, [...traversed, part]);
+    setProperty(current, key, next[key]);
   }
 }
 
-export function wrap<T extends StoreNode>(value: T): T {
-  let p: T = value[$PROXY];
+function setStoreArray(
+  current: StoreNode,
+  next:
+    | Array<any>
+    | Record<string, any>
+    | ((prev: StoreNode) => Array<any> | Record<string, any>),
+) {
+  if (typeof next === "function") {
+    next = next(current);
+  }
 
-  if (!p) {
-    p = new Proxy(value, proxyTraps);
+  if (Array.isArray(next)) {
+    if (current === next) {
+      return;
+    }
+
+    const nextLength = next.length;
+
+    for (let i = 0; i < nextLength; i++) {
+      const newValue = next[i];
+      if (current[i] !== newValue) {
+        setProperty(current, i, newValue);
+      }
+    }
+
+    if (current.length !== nextLength) {
+      setProperty(current, "length", nextLength);
+    }
+  } else {
+    mergeStoreNode(current, next);
+  }
+}
+
+function setStorePath(
+  current: StoreNode,
+  path: [...any[], any],
+  traversed?: PropertyKey[],
+): void {
+  let part;
+  let prevValue = current;
+  traversed ??= [];
+
+  if (path.length > 1) {
+    part = path.shift();
+
+    const partType = typeof part;
+    const isArray = Array.isArray(current);
+
+    if (Array.isArray(part)) {
+      for (let i = 0; i < part.length; i++) {
+        setStorePath(current, [part[i], ...path], [...traversed, i]);
+      }
+
+      return;
+    } else if (isArray && partType === "function") {
+      for (let i = 0; i < current.length; i++) {
+        if (part(current[i], i)) {
+          setStorePath(current, [i, ...path], [...traversed, i]);
+        }
+      }
+
+      return;
+    } else if (isArray && typeof part === "object") {
+      const { from = 0, to = current.length, step = 1 } = part;
+
+      for (let i = from; i < to; i += step) {
+        setStorePath(current, [i, ...path], [...traversed, i]);
+      }
+
+      return;
+    } else if (path.length > 1) {
+      setStorePath(current[part], path, [...traversed, part]);
+      
+      return;
+    }
+
+    traversed = [...traversed, part];
+    prevValue = current[part];
+  }
+
+  let newValue = path[0];
+
+  newValue = typeof newValue === "function"
+    ? newValue(prevValue, traversed)
+    : newValue;
+
+  if (prevValue === newValue) {
+    return;
+  }
+
+  if (isWrappable(prevValue) && isWrappable(newValue)) {
+    mergeStoreNode(prevValue, newValue);
+    return;
+  }
+
+  setProperty(current, part, newValue);
+}
+
+export function wrap<T extends StoreNode>(value: T): T {
+  let proxy: T = value[$PROXY];
+
+  if (!proxy) {
+    proxy = new Proxy<T>(value, proxyTraps);
 
     Reflect.defineProperty(value, $PROXY, {
-      value: p,
+      value: proxy,
     });
 
     const keys = Object.keys(value);
@@ -207,19 +267,29 @@ export function wrap<T extends StoreNode>(value: T): T {
       if (descriptor.get) {
         Reflect.defineProperty(value, key, {
           enumerable: descriptor.enumerable,
-          get: descriptor.get.bind(p),
+          get: descriptor.get.bind(proxy),
         });
       }
     }
   }
 
-  return p;
+  return proxy;
 }
 
 export function createStore<T extends object>(
   object: T,
-): [T, (...path: [...string[], any]) => void] {
+): [T, (...path: [...any[], any]) => void] {
   const wrappedStore = wrap(object);
+  const setStore = (...path: [...any[], any]) => {
+    if (Array.isArray(object) && path.length === 1) {
+      setStoreArray(object, path[0]);
+    } else {
+      setStorePath(object, path);
+    }
+  };
 
-  return [wrappedStore, (...path: [...string[], any]) => setPath(object, path)];
+  return [
+    wrappedStore,
+    setStore,
+  ];
 }

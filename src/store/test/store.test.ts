@@ -120,105 +120,119 @@ describe("Simple setState modes", () => {
     assertStrictEquals(state.data.ending, 2);
   });
 
-  // it("Test Array", () => {
-  //   const [todos, setTodos] = createStore([
-  //     { id: 1, title: "Go To Work", done: true },
-  //     { id: 2, title: "Eat Lunch", done: false },
-  //   ]);
-  //   setTodos(1, { done: true });
-  //   setTodos([...todos, { id: 3, title: "Go Home", done: false }]);
-  //   setTodos((t) => [...t.slice(1)]);
-  //   expect(Array.isArray(todos)).toBe(true);
-  //   expect(todos[0].done).toBe(true);
-  //   expect(todos[1].title).toBe("Go Home");
-  // });
+  it("Test Array", () => {
+    const [todos, setTodos] = createStore([
+      { id: 1, title: "Go To Work", done: true },
+      { id: 2, title: "Eat Lunch", done: false },
+    ]);
+    setTodos(1, { done: true });
+    setTodos([...todos, { id: 3, title: "Go Home", done: false }]);
+    setTodos((t) => [...t.slice(1)]);
+    assertStrictEquals(Array.isArray(todos), true);
+    assertStrictEquals(todos[0].done, true);
+    assertStrictEquals(todos[1].title, "Go Home");
+  });
 
-  // it("Test Array Nested", () => {
-  //   const [state, setState] = createStore({
-  //     todos: [
-  //       { id: 1, title: "Go To Work", done: true },
-  //       { id: 2, title: "Eat Lunch", done: false },
-  //     ],
-  //   });
-  //   setState("todos", 1, { done: true });
-  //   setState("todos", [...state.todos, {
-  //     id: 3,
-  //     title: "Go Home",
-  //     done: false,
-  //   }]);
-  //   expect(Array.isArray(state.todos)).toBe(true);
-  //   expect(state.todos[1].done).toBe(true);
-  //   expect(state.todos[2].title).toBe("Go Home");
-  // });
+  it("Test Array Nested", () => {
+    const [state, setState] = createStore({
+      todos: [
+        { id: 1, title: "Go To Work", done: true },
+        { id: 2, title: "Eat Lunch", done: false },
+      ],
+    });
+    setState("todos", 1, { done: true });
+    setState("todos", [...state.todos, {
+      id: 3,
+      title: "Go Home",
+      done: false,
+    }]);
+    assertStrictEquals(Array.isArray(state.todos), true);
+    assertStrictEquals(state.todos[1].done, true);
+    assertStrictEquals(state.todos[2].title, "Go Home");
+  });
 });
 
-//   describe("Array setState modes", () => {
-//     test("Update Specific", () => {
-//       const [state, setState] = createStore([1, 2, 3, 4, 5]);
-//       setState([1, 3], (r, t) => {
-//         expect(typeof t[0]).toBe("number");
-//         return r * 2;
-//       });
-//       expect(state[0]).toBe(1);
-//       expect(state[1]).toBe(4);
-//       expect(state[2]).toBe(3);
-//       expect(state[3]).toBe(8);
-//       expect(state[4]).toBe(5);
-//       expect(Object.keys(state)).toStrictEqual(["0", "1", "2", "3", "4"]);
-//     });
-//     test("Update Specific Object", () => {
-//       const [state, setState] = createStore([1, 2, 3, 4, 5]);
-//       setState({
-//         1: 4,
-//         3: 8
-//       });
-//       expect(state[0]).toBe(1);
-//       expect(state[1]).toBe(4);
-//       expect(state[2]).toBe(3);
-//       expect(state[3]).toBe(8);
-//       expect(state[4]).toBe(5);
-//       expect(Object.keys(state)).toStrictEqual(["0", "1", "2", "3", "4"]);
-//     });
-//     test("Update filterFn", () => {
-//       const [state, setState] = createStore([1, 2, 3, 4, 5]);
-//       setState(
-//         (r, i) => Boolean(i % 2),
-//         (r, t) => {
-//           expect(typeof t[0]).toBe("number");
-//           return r * 2;
-//         }
-//       );
-//       expect(state[0]).toBe(1);
-//       expect(state[1]).toBe(4);
-//       expect(state[2]).toBe(3);
-//       expect(state[3]).toBe(8);
-//       expect(state[4]).toBe(5);
-//     });
-//     test("Update traversal range", () => {
-//       const [state, setState] = createStore([1, 2, 3, 4, 5]);
-//       setState({ from: 1, to: 4, by: 2 }, (r, t) => {
-//         expect(typeof t[0]).toBe("number");
-//         return r * 2;
-//       });
-//       expect(state[0]).toBe(1);
-//       expect(state[1]).toBe(4);
-//       expect(state[2]).toBe(3);
-//       expect(state[3]).toBe(8);
-//       expect(state[4]).toBe(5);
-//     });
-//     test("Update traversal range defaults", () => {
-//       const [state, setState] = createStore([1, 2, 3, 4, 5]);
-//       setState({}, (r, t) => {
-//         expect(typeof t[0]).toBe("number");
-//         return r * 2;
-//       });
-//       expect(state[0]).toBe(2);
-//       expect(state[1]).toBe(4);
-//       expect(state[2]).toBe(6);
-//       expect(state[3]).toBe(8);
-//       expect(state[4]).toBe(10);
-//     });
-//   });
+describe("Array setState modes", () => {
+  it("Update Specific", () => {
+    const [state, setState] = createStore([1, 2, 3, 4, 5]);
+    setState([1, 3], (r, t) => {
+      assertStrictEquals(typeof t[0], "number");
+
+      return r * 2;
+    });
+
+    assertStrictEquals(state[0], 1);
+    assertStrictEquals(state[1], 4);
+    assertStrictEquals(state[2], 3);
+    assertStrictEquals(state[3], 8);
+    assertStrictEquals(state[4], 5);
+
+    assertEquals(Object.keys(state), ["0", "1", "2", "3", "4"]);
+  });
+
+  it("Update Specific Object", () => {
+    const [state, setState] = createStore([1, 2, 3, 4, 5]);
+    setState({
+      1: 4,
+      3: 8,
+    });
+
+    assertStrictEquals(state[0], 1);
+    assertStrictEquals(state[1], 4);
+    assertStrictEquals(state[2], 3);
+    assertStrictEquals(state[3], 8);
+    assertStrictEquals(state[4], 5);
+
+    assertEquals(Object.keys(state), ["0", "1", "2", "3", "4"]);
+  });
+
+  it("Update filterFn", () => {
+    const [state, setState] = createStore([1, 2, 3, 4, 5]);
+    setState(
+      (r, i) => Boolean(i % 2),
+      (r, t) => {
+        assertStrictEquals(typeof t[0], "number");
+
+        return r * 2;
+      },
+    );
+
+    assertStrictEquals(state[0], 1);
+    assertStrictEquals(state[1], 4);
+    assertStrictEquals(state[2], 3);
+    assertStrictEquals(state[3], 8);
+    assertStrictEquals(state[4], 5);
+  });
+
+  it("Update traversal range", () => {
+    const [state, setState] = createStore([1, 2, 3, 4, 5]);
+    setState({ from: 1, to: 4, step: 2 }, (r, t) => {
+      assertStrictEquals(typeof t[0], "number");
+
+      return r * 2;
+    });
+
+    assertStrictEquals(state[0], 1);
+    assertStrictEquals(state[1], 4);
+    assertStrictEquals(state[2], 3);
+    assertStrictEquals(state[3], 8);
+    assertStrictEquals(state[4], 5);
+  });
+
+  it("Update traversal range defaults", () => {
+    const [state, setState] = createStore([1, 2, 3, 4, 5]);
+    setState({}, (r, t) => {
+      assertStrictEquals(typeof t[0], "number");
+
+      return r * 2;
+    });
+    assertStrictEquals(state[0], 2);
+    assertStrictEquals(state[1], 4);
+    assertStrictEquals(state[2], 6);
+    assertStrictEquals(state[3], 8);
+    assertStrictEquals(state[4], 10);
+  });
+});
 
 //   describe("Unwrapping Edge Cases", () => {
 //     test("Unwrap nested frozen state object", () => {
