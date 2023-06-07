@@ -6,6 +6,8 @@ import {
   tick,
 } from "#/mod.ts";
 import {
+  assertSpyCall,
+  assertSpyCallArg,
   assertSpyCalls,
   assertStrictEquals,
   describe,
@@ -147,24 +149,6 @@ describe("effect", () => {
     tick();
     assertSpyCalls(effectA, 0);
   });
-
-  //   it("should call returned dispose function", () => {
-  //     const dispose = spy();
-
-  //     const $a = createSignal(0);
-
-  //     createEffect(() => {
-  //       $a();
-  //       return dispose;
-  //     });
-
-  //     assertSpyCalls(dispose, 0);
-
-  //     for (let i = 1; i <= 3; i += 1) {
-  //       $a.set(i);
-  //         //       assertSpyCalls(dispose, i);
-  //     }
-  //   });
 
   it("should run all disposals before each new run", () => {
     const effectA = spy();
@@ -353,5 +337,151 @@ describe("effect", () => {
     assertStrictEquals($a(), 3);
     assertStrictEquals($c(), 4);
     assertStrictEquals($d(), 6);
+  });
+
+  describe("sync effect", () => {
+    it("should not batch automatically", () => {
+      const effect = spy();
+
+      const $a = createSignal(0);
+
+      createEffect(
+        () => {
+          effect($a());
+        },
+        undefined,
+        {
+          sync: true,
+        },
+      );
+
+      assertSpyCalls(effect, 1);
+
+      $a.set(1);
+
+      assertSpyCalls(effect, 2);
+
+      $a.set(2);
+
+      assertSpyCalls(effect, 3);
+    });
+
+    it("should execute immediately only once with sync='init'", () => {
+      const effect = spy();
+
+      const $a = createSignal(0);
+
+      createEffect(
+        () => {
+          effect($a());
+        },
+        undefined,
+        {
+          sync: "init",
+        },
+      );
+
+      assertSpyCalls(effect, 1);
+
+      $a.set(1);
+      $a.set(2);
+      assertSpyCalls(effect, 1);
+
+      tick();
+      assertSpyCalls(effect, 2);
+      assertSpyCallArg(effect, 1, 0, 2);
+    });
+
+    it("should queue children effects of sync effects lazily", () => {
+      const outerEffect = spy();
+      const innerEffect = spy();
+
+      const $a = createSignal(0);
+      const $b = createSignal(0);
+
+      createEffect(
+        () => {
+          outerEffect($a());
+
+          createEffect(() => {
+            innerEffect($b());
+          });
+        },
+        undefined,
+        {
+          sync: true,
+        },
+      );
+
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 0);
+
+      tick();
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 1);
+
+      $b.set(1);
+      $b.set(2);
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 1);
+
+      tick();
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 2);
+
+      $a.set(1);
+      $a.set(2);
+      assertSpyCalls(outerEffect, 3);
+      assertSpyCalls(innerEffect, 2);
+
+      tick();
+      assertSpyCalls(outerEffect, 3);
+      assertSpyCalls(innerEffect, 3);
+    });
+
+    it("should queue sync children effects of lazy effects synchronously", () => {
+      const outerEffect = spy();
+      const innerEffect = spy();
+
+      const $a = createSignal(0);
+      const $b = createSignal(0);
+
+      createEffect(
+        () => {
+          outerEffect($a());
+
+          createEffect(() => {
+            innerEffect($b());
+          }, undefined, {
+            sync: true,
+          });
+        },
+      );
+
+      assertSpyCalls(outerEffect, 0);
+      assertSpyCalls(innerEffect, 0);
+
+      tick();
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 1);
+
+      $b.set(1);
+      $b.set(2);
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 3);
+
+      tick();
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 3);
+
+      $a.set(1);
+      $a.set(2);
+      assertSpyCalls(outerEffect, 1);
+      assertSpyCalls(innerEffect, 3);
+
+      tick();
+      assertSpyCalls(outerEffect, 2);
+      assertSpyCalls(innerEffect, 4); // new one is created
+    });
   });
 });

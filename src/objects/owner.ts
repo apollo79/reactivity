@@ -75,15 +75,15 @@ export class Owner {
 
     this.state = STATE_DISPOSED;
 
-    this.childrenScopes.forEach((scope) => {
+    for (const scope of this.childrenScopes) {
       scope.dispose();
-    });
+    }
 
     this.childrenScopes.clear();
 
-    this.disposal?.forEach((cleanup) => {
+    for (const cleanup of this.disposal) {
       cleanup();
-    });
+    }
 
     this.disposal = [];
 

@@ -4,8 +4,10 @@ import {
   CURRENTOBSERVER,
   STATE_DIRTY,
   STATE_DISPOSED,
+  SYNCSCHEDULER,
 } from "~/context.ts";
 import { Memo } from "~/objects/memo.ts";
+import { Effect } from "~/objects/effect.ts";
 
 export type Accessor<T> = () => T;
 export type Setter<T> = (nextValue: T | UpdateFunction<T>) => T;
@@ -101,5 +103,7 @@ export class Observable<T = unknown> {
     for (const observer of this.observers) {
       observer.stale(newState);
     }
+
+    SYNCSCHEDULER.flush();
   }
 }

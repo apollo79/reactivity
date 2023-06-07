@@ -1,14 +1,15 @@
 import type { Owner } from "~/objects/owner.ts";
 import { Effect } from "~/objects/effect.ts";
 import { Observer } from "../mod.ts";
-import { AsyncScheduler } from "./scheduler.ts";
+import { AsyncScheduler, SyncScheduler } from "./scheduler.ts";
 
 let CURRENTOWNER: Owner | undefined;
 let CURRENTOBSERVER: Observer<any> | undefined;
 let BATCH: Effect<any>[] | undefined;
 const ASYNCSCHEDULER = new AsyncScheduler();
+const SYNCSCHEDULER = new SyncScheduler();
 
-export { ASYNCSCHEDULER, BATCH, CURRENTOBSERVER, CURRENTOWNER };
+export { ASYNCSCHEDULER, BATCH, CURRENTOBSERVER, CURRENTOWNER, SYNCSCHEDULER };
 
 function setOwner(owner: typeof CURRENTOWNER) {
   CURRENTOWNER = owner;

@@ -10,6 +10,7 @@ export type MemoOptions<T> = ObservableOptions<T>;
  */
 export class Memo<T> extends Observer<T> {
   prevValue: Observable<T>;
+  declare readonly sync?: false;
 
   constructor(
     fn: ObserverFunction<undefined | T, T>,
@@ -22,16 +23,12 @@ export class Memo<T> extends Observer<T> {
     this.prevValue.parent = this;
   }
 
-  override update(): T {
+  override update(): void {
     const result = super.run(this.prevValue.value);
 
     if (result !== ERRORTHROWN_SYMBOL) {
       this.prevValue.write(result);
-
-      return result;
     }
-
-    return undefined!;
   }
 
   /**

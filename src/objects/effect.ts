@@ -3,8 +3,13 @@ import {
   CacheState,
   ERRORTHROWN_SYMBOL,
   STATE_CLEAN,
+  SYNCSCHEDULER,
 } from "~/context.ts";
 import { Observer, type ObserverFunction } from "~/objects/observer.ts";
+
+export type EffectOptions = {
+  sync?: true | "init";
+};
 
 /**
  * An effect is executed immediately on creation and every time again when one of its dependencies changes
@@ -12,27 +17,45 @@ import { Observer, type ObserverFunction } from "~/objects/observer.ts";
 export class Effect<T> extends Observer<T> {
   /** Stores the last return value of the callback */
   prevValue: T | undefined;
+  declare readonly sync?: true;
 
-  constructor(fn: ObserverFunction<undefined | T, T>, init?: T) {
+  constructor(
+    fn: ObserverFunction<undefined | T, T>,
+    init?: T,
+    options?: EffectOptions,
+  ) {
     super(fn);
 
     this.prevValue = init;
 
-    ASYNCSCHEDULER.schedule(this);
+    if (options?.sync === true) {
+      this.sync = true;
+    }
+
+    if (options?.sync === "init") {
+      this.update();
+    } else {
+      this.schedule();
+    }
+  }
+
+  schedule(): void {
+    if (this.sync) {
+      this.update();
+    } else {
+      ASYNCSCHEDULER.schedule(this);
+    }
   }
 
   /**
    * Just runs the callback with this effect as scope
    */
-  override update(): T {
+  override update(): void {
     const result = super.run(this.prevValue);
 
     if (result !== ERRORTHROWN_SYMBOL) {
       this.prevValue = result;
-
-      return result;
     }
-    return result === ERRORTHROWN_SYMBOL ? undefined! : result;
   }
 
   /**
@@ -44,8 +67,13 @@ export class Effect<T> extends Observer<T> {
       return;
     }
 
+    // if the state is not clean, it already has been added to execution queue
     if (this.state === STATE_CLEAN) {
-      ASYNCSCHEDULER.schedule(this);
+      if (this.sync) {
+        SYNCSCHEDULER.schedule(this);
+      } else {
+        ASYNCSCHEDULER.schedule(this);
+      }
     }
 
     this.state = newState;

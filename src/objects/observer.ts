@@ -19,6 +19,7 @@ export abstract class Observer<T> extends Owner {
   /** One part of the double-linked list between observables and computations. It holds all observables that this computation depends on. */
   readonly sources = new Set<Observable<any>>();
   readonly fn: ObserverFunction<undefined | T, T>;
+  readonly sync?: boolean;
 
   constructor(fn: ObserverFunction<undefined | T, T>) {
     super();
@@ -34,16 +35,16 @@ export abstract class Observer<T> extends Owner {
   override dispose(): void {
     super.dispose();
 
-    this.sources.forEach((observable) => {
+    for (const observable of this.sources) {
       observable.observers.delete(this);
-    });
+    }
 
     this.sources.clear();
 
     this.parentScope?.childrenScopes.delete(this);
   }
 
-  abstract update(): T;
+  abstract update(): void;
 
   /**
    * Runs the callback with this computation as scope. This is used in the effects and memos `run` methods.
