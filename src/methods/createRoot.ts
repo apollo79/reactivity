@@ -1,5 +1,6 @@
-import { Root, type RootFunction } from "~/objects/root.ts";
+import { Root } from "~/objects/root.ts";
+import type { RootFunction } from "~/types.ts";
 
-export function createRoot<T>(fn: RootFunction<T>) {
+export function createRoot<T>(fn: RootFunction<T>): T {
   return new Root(fn).wrap();
 }

@@ -1,15 +1,11 @@
 import {
   ASYNCSCHEDULER,
-  CacheState,
   ERRORTHROWN_SYMBOL,
   STATE_CLEAN,
   SYNCSCHEDULER,
 } from "~/context.ts";
-import { Observer, type ObserverFunction } from "~/objects/observer.ts";
-
-export type EffectOptions = {
-  sync?: true | "init";
-};
+import { Observer } from "~/objects/observer.ts";
+import type { CacheState, EffectOptions, ObserverFunction } from "~/types.ts";
 
 /**
  * An effect is executed immediately on creation and every time again when one of its dependencies changes

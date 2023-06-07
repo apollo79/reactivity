@@ -1,5 +1,4 @@
 import {
-  type CacheState,
   CURRENTOBSERVER,
   CURRENTOWNER,
   ERRORTHROWN_SYMBOL,
@@ -8,8 +7,8 @@ import {
   STATE_CLEAN,
   STATE_DISPOSED,
 } from "~/context.ts";
-import type { CleanupFunction } from "~/methods/onDispose.ts";
 import { handleError } from "~/utils/handleError.ts";
+import type { CacheState, CleanupFunction } from "~/types.ts";
 
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes

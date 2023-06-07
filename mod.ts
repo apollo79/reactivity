@@ -18,14 +18,19 @@ export function getOwner(): Owner | undefined {
   return Owner.getOwner();
 }
 
-export function runWithOwner<T>(fn: () => T, owner: typeof CURRENTOWNER) {
+export function runWithOwner<T>(fn: () => T, owner: typeof CURRENTOWNER): T {
   const result = Owner.runWithOwner(fn, owner, undefined);
 
-  return result === ERRORTHROWN_SYMBOL ? undefined : result;
+  return result === ERRORTHROWN_SYMBOL ? undefined! : result;
 }
 
+export type {
+  Accessor,
+  EffectFunction,
+  EffectOptions,
+  Setter,
+  Signal,
+  SignalOptions,
+} from "~/types.ts";
 export type { Owner } from "~/objects/owner.ts";
-export type { Accessor, Setter } from "~/objects/observable.ts";
-export type { Signal, SignalOptions } from "~/methods/createSignal.ts";
 export type { Observer } from "~/objects/observer.ts";
-export type { EffectFunction, EffectOptions } from "~/methods/createEffect.ts";

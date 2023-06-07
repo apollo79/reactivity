@@ -1,14 +1,5 @@
-import type {
-  Accessor,
-  ObservableOptions,
-  Setter,
-} from "~/objects/observable.ts";
 import { Observable } from "~/objects/observable.ts";
-
-export type SignalOptions<T> = ObservableOptions<T>;
-export type Signal<T> = Accessor<T> & {
-  set: Setter<T>;
-};
+import type { Signal, SignalOptions } from "~/types.ts";
 
 export function createSignal<T>(): Signal<T | undefined>;
 export function createSignal<T>(

@@ -1,6 +1,5 @@
 import { CURRENTOWNER } from "~/context.ts";
-
-export type CleanupFunction = () => void;
+import type { CleanupFunction } from "~/types.ts";
 
 export function onDispose(fn: CleanupFunction) {
   if (!CURRENTOWNER) {

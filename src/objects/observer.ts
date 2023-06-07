@@ -1,5 +1,4 @@
 import {
-  type CacheState,
   ERRORTHROWN_SYMBOL,
   STATE_CHECK,
   STATE_CLEAN,
@@ -7,10 +6,7 @@ import {
 } from "~/context.ts";
 import { Owner } from "~/objects/owner.ts";
 import { type Observable } from "~/objects/observable.ts";
-
-export type ObserverFunction<Prev, Next extends Prev = Prev> = (
-  prevValue: Prev,
-) => Next;
+import { CacheState, ObserverFunction } from "~/types.ts";
 
 /**
  * A computation is a scope and the abstraction over effects and memos.

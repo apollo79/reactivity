@@ -450,11 +450,15 @@ describe("effect", () => {
         () => {
           outerEffect($a());
 
-          createEffect(() => {
-            innerEffect($b());
-          }, undefined, {
-            sync: true,
-          });
+          createEffect(
+            () => {
+              innerEffect($b());
+            },
+            undefined,
+            {
+              sync: true,
+            },
+          );
         },
       );
 

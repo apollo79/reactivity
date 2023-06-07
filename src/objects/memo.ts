@@ -1,9 +1,7 @@
-import { CacheState, ERRORTHROWN_SYMBOL, STATE_CHECK } from "~/context.ts";
-import { Observer, type ObserverFunction } from "~/objects/observer.ts";
+import { ERRORTHROWN_SYMBOL, STATE_CHECK } from "~/context.ts";
+import { Observer } from "~/objects/observer.ts";
 import { Observable } from "~/objects/observable.ts";
-import type { ObservableOptions } from "~/objects/observable.ts";
-
-export type MemoOptions<T> = ObservableOptions<T>;
+import type { CacheState, MemoOptions, ObserverFunction } from "~/types.ts";
 
 /**
  * A memo is a computation that stores the last return value of its execution as observable so it can be depended on

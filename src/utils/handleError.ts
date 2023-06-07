@@ -1,6 +1,6 @@
 import { CURRENTOWNER, ERRORHANDLER_SYMBOL } from "~/context.ts";
-import { ErrorFunction } from "~/methods/catchError.ts";
 import { castError } from "~/utils/castError.ts";
+import { ErrorFunction } from "~/types.ts";
 
 export function handleError(thrown: unknown) {
   const error = castError(thrown);

@@ -1,7 +1,6 @@
 import { Owner } from "~/objects/owner.ts";
-import { ERRORTHROWN_SYMBOL } from "../context.ts";
-
-export type RootFunction<T> = (dispose: () => void) => T;
+import { ERRORTHROWN_SYMBOL } from "~/context.ts";
+import type { RootFunction } from "~/types.ts";
 
 /**
  * A root is a scope under which the provided callback is executed. It also passes the callback the `dispose` function for manual disposal.

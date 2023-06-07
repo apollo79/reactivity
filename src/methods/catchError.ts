@@ -1,7 +1,6 @@
 import { ERRORHANDLER_SYMBOL } from "~/context.ts";
 import { Owner } from "~/objects/owner.ts";
-
-export type ErrorFunction = (error: Error) => void;
+import { ErrorFunction } from "~/types.ts";
 
 export function catchError(tryFn: () => void, handler: ErrorFunction) {
   const scope = new Owner();

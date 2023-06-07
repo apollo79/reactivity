@@ -1,23 +1,17 @@
-import { Observer } from "~/objects/observer.ts";
 import {
-  type CacheState,
   CURRENTOBSERVER,
   STATE_DIRTY,
   STATE_DISPOSED,
   SYNCSCHEDULER,
 } from "~/context.ts";
-import { Memo } from "~/objects/memo.ts";
-import { Effect } from "~/objects/effect.ts";
-
-export type Accessor<T> = () => T;
-export type Setter<T> = (nextValue: T | UpdateFunction<T>) => T;
-
-type EqualsFunction<T> = (prev: T, next: T) => boolean;
-type UpdateFunction<T> = (current: T) => T;
-
-export type ObservableOptions<T> = {
-  equals?: false | EqualsFunction<T>;
-};
+import type { Observer } from "~/objects/observer.ts";
+import type { Memo } from "~/objects/memo.ts";
+import type {
+  CacheState,
+  EqualsFunction,
+  ObservableOptions,
+  UpdateFunction,
+} from "~/types.ts";
 
 /**
  * An observable can be a dependency of effects / memos

@@ -1,11 +1,5 @@
-import { type ObserverFunction } from "~/objects/observer.ts";
-import { NoInfer } from "~/context.ts";
-import { Effect, EffectOptions } from "~/objects/effect.ts";
-
-export type EffectFunction<Prev, Next extends Prev = Prev> = ObserverFunction<
-  Prev,
-  Next
->;
+import { Effect } from "~/objects/effect.ts";
+import type { EffectFunction, EffectOptions, NoInfer } from "~/types.ts";
 
 export function createEffect<Next>(
   fn: EffectFunction<undefined | NoInfer<Next>, Next>,
