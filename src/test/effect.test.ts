@@ -3,30 +3,27 @@ import {
   createMemo,
   createSignal,
   onDispose,
-  setScheduling,
+  tick,
 } from "#/mod.ts";
 import {
   assertSpyCalls,
   assertStrictEquals,
-  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("effect", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("should run effect", () => {
     const $a = createSignal(0),
       $effect = spy(() => void $a());
 
     createEffect($effect);
+    tick();
     assertSpyCalls($effect, 1);
 
     $a.set(1);
+    tick();
     assertSpyCalls($effect, 2);
   });
 
@@ -43,16 +40,20 @@ describe("effect", () => {
       $d();
     });
 
+    tick();
     assertSpyCalls(effectA, 1);
 
     $a.set(20);
+    tick();
     assertSpyCalls(effectA, 2);
 
     $b.set(20);
+    tick();
     assertSpyCalls(effectA, 3);
 
     $a.set(20);
     $b.set(20);
+    tick();
     assertSpyCalls(effectA, 3);
   });
 
@@ -74,27 +75,31 @@ describe("effect", () => {
       });
     });
 
+    tick();
     assertSpyCalls(outerEffect, 1);
     assertSpyCalls(innerEffect, 1);
     assertSpyCalls(innerDispose, 0);
 
     $b.set(1);
-
+    tick();
     assertSpyCalls(outerEffect, 1);
     assertSpyCalls(innerEffect, 2);
     assertSpyCalls(innerDispose, 1);
 
     $b.set(2);
+    tick();
     assertSpyCalls(outerEffect, 1);
     assertSpyCalls(innerEffect, 3);
     assertSpyCalls(innerDispose, 2);
 
     $a.set(1);
+    tick();
     assertSpyCalls(outerEffect, 2);
     assertSpyCalls(innerEffect, 4); // new one is created
     assertSpyCalls(innerDispose, 3);
 
     $b.set(3);
+    tick();
     assertSpyCalls(outerEffect, 2);
     assertSpyCalls(innerEffect, 5);
     assertSpyCalls(innerDispose, 4);
@@ -102,6 +107,7 @@ describe("effect", () => {
     stop();
     $a.set(10);
     $b.set(10);
+    tick();
     assertSpyCalls(outerEffect, 2);
     assertSpyCalls(innerEffect, 5);
     assertSpyCalls(innerDispose, 5);
@@ -117,10 +123,29 @@ describe("effect", () => {
       $a();
     });
 
+    tick();
     stop();
 
     $a.set(20);
+    tick();
     assertSpyCalls(effectA, 1);
+  });
+
+  it("should not run effect if stopped early", () => {
+    const effectA = spy();
+
+    const $a = createSignal(10);
+
+    const stop = createEffect(() => {
+      effectA();
+      $a();
+    });
+
+    stop();
+
+    $a.set(20);
+    tick();
+    assertSpyCalls(effectA, 0);
   });
 
   //   it("should call returned dispose function", () => {
@@ -160,12 +185,14 @@ describe("effect", () => {
       fnA(), fnB(), $a();
     });
 
+    tick();
     assertSpyCalls(effectA, 1);
     assertSpyCalls(disposeA, 0);
     assertSpyCalls(disposeB, 0);
 
     for (let i = 1; i <= 3; i += 1) {
       $a.set(i);
+      tick();
       assertSpyCalls(effectA, i + 1);
       assertSpyCalls(disposeA, i);
       assertSpyCalls(disposeB, i);
@@ -183,9 +210,9 @@ describe("effect", () => {
     });
 
     stop();
-
+    tick();
     $a.set(10);
-    assertSpyCalls(innerEffect, 1);
+    assertSpyCalls(innerEffect, 0);
   });
 
   it("should conditionally observe", () => {
@@ -200,21 +227,27 @@ describe("effect", () => {
       $effect();
     });
 
+    tick();
     assertSpyCalls($effect, 1);
 
     $b.set(1);
+    tick();
     assertSpyCalls($effect, 1);
 
     $a.set(1);
+    tick();
     assertSpyCalls($effect, 2);
 
     $cond.set(false);
+    tick();
     assertSpyCalls($effect, 2);
 
     $b.set(2);
+    tick();
     assertSpyCalls($effect, 3);
 
     $a.set(3);
+    tick();
     assertSpyCalls($effect, 3);
   });
 
@@ -237,8 +270,9 @@ describe("effect", () => {
     }
 
     createEffect(() => ($cond() ? fnA() : fnB()));
-
+    tick();
     $cond.set(false);
+    tick();
     assertSpyCalls(disposeA, 1);
   });
 
@@ -266,19 +300,20 @@ describe("effect", () => {
       //   { id: "root-effect" },
     );
 
+    tick();
     assertStrictEquals(values.length, 3);
     assertStrictEquals(values.join(","), "0,0,1");
 
     loop = 1;
     values = [];
     $value.set(1);
-
+    tick();
     assertStrictEquals(values.length, 2);
     assertStrictEquals(values.join(","), "1,1");
 
     values = [];
     $value.set(2);
-
+    tick();
     assertStrictEquals(values.length, 2);
     assertStrictEquals(values.join(","), "2,2");
   });
@@ -298,6 +333,7 @@ describe("effect", () => {
       $b();
     });
 
+    tick();
     assertStrictEquals($a(), 1);
     assertStrictEquals($c(), 2);
     assertStrictEquals($d(), 4);

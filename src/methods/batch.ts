@@ -1,11 +1,11 @@
-import { SCHEDULER, setBatch } from "~/context.ts";
+import { ASYNCSCHEDULER, setBatch } from "~/context.ts";
 
 export function batch(fn: () => void): void {
   setBatch([]);
   try {
     fn();
 
-    SCHEDULER.runEffects();
+    ASYNCSCHEDULER.runEffects();
   } finally {
     setBatch(undefined);
   }

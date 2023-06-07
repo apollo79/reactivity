@@ -1,7 +1,7 @@
 import {
+  ASYNCSCHEDULER,
   CacheState,
   ERRORTHROWN_SYMBOL,
-  SCHEDULER,
   STATE_CLEAN,
 } from "~/context.ts";
 import { Observer, type ObserverFunction } from "~/objects/observer.ts";
@@ -18,7 +18,7 @@ export class Effect<T> extends Observer<T> {
 
     this.prevValue = init;
 
-    this.update();
+    ASYNCSCHEDULER.schedule(this);
   }
 
   /**
@@ -45,7 +45,7 @@ export class Effect<T> extends Observer<T> {
     }
 
     if (this.state === STATE_CLEAN) {
-      SCHEDULER.enqueue(this);
+      ASYNCSCHEDULER.schedule(this);
     }
 
     this.state = newState;

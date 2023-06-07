@@ -1,11 +1,7 @@
-import { createEffect, createRoot, onDispose, setScheduling } from "#/mod.ts";
-import { assertSpyCalls, beforeAll, describe, it, spy } from "./util.ts";
+import { createEffect, createRoot, onDispose, tick } from "#/mod.ts";
+import { assertSpyCalls, describe, it, spy } from "./util.ts";
 
 describe("onDispose", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("should be invoked when computation is disposed", () => {
     const callback1 = spy();
     const callback2 = spy();
@@ -16,7 +12,7 @@ describe("onDispose", () => {
       onDispose(callback2);
       onDispose(callback3);
     });
-
+    tick();
     stop();
 
     assertSpyCalls(callback1, 1);
@@ -32,12 +28,11 @@ describe("onDispose", () => {
       early();
     });
 
+    tick();
     assertSpyCalls(dispose, 1);
 
-    console.log("stopping");
-
     stop();
-
+    tick();
     assertSpyCalls(dispose, 1);
   });
 
@@ -52,7 +47,7 @@ describe("onDispose", () => {
       const stop = createEffect(() => {});
 
       stop();
-
+      tick();
       assertSpyCalls(dispose, 0);
     });
   });

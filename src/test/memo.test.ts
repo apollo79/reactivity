@@ -5,23 +5,18 @@ import {
   createMemo,
   createRoot,
   createSignal,
-  setScheduling,
+  tick,
 } from "#/mod.ts";
 import {
   assertSpyCallArg,
   assertSpyCalls,
   assertStrictEquals,
-  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("memo", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("should store and return value on read", () => {
     const $a = createSignal(10);
     const $b = createSignal(10);
@@ -170,16 +165,18 @@ describe("memo", () => {
       effectA();
     });
 
+    tick();
     assertStrictEquals($b(), 0);
     assertSpyCalls(effectA, 1);
 
     $a.set(2);
-
+    tick();
     assertStrictEquals($b(), 2);
     assertSpyCalls(effectA, 2);
 
     // no-change
     $a.set(3);
+    tick();
     assertStrictEquals($b(), 2);
     assertSpyCalls(effectA, 2);
   });
@@ -195,6 +192,7 @@ describe("memo", () => {
         }, "foo");
       }, console.log);
 
+      tick();
       assertStrictEquals($a!(), "foo");
     });
   });

@@ -31,8 +31,8 @@
         a diagnostic warning for that value: "Please use type node instead(2)" */
       "type": "node",
       /* disabled specific entrypoint */
-      // "program": "${workspaceFolder}/main.ts",
-      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/src/test/effect.test.ts",
+      // "cwd": "${workspaceFolder}/src/store",
       /* modified: using deno process name from my PATH */
       "runtimeExecutable": "deno",
       "runtimeArgs": [
@@ -40,7 +40,8 @@
         "test",
         /* modified: was generated as "--inspect", but using this option
           causes an initial break to wait for the debugger to attach */
-        "--inspect-brk"
+        "--inspect-brk",
+        "--no-check"
         /* disabled: allowing all permissions is unsafe: only allow
           the specific permissions that your scripts need */
         // "--allow-all"

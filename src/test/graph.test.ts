@@ -1,20 +1,15 @@
 // https://github.com/preactjs/signals/blob/main/packages/core/test/signal.test.tsx#L1249
 
-import { createMemo, createSignal, setScheduling } from "#/mod.ts";
+import { createMemo, createSignal } from "#/mod.ts";
 import {
   assertSpyCalls,
   assertStrictEquals,
-  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("graph", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("should drop A->B->A updates", () => {
     //     A
     //   / |

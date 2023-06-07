@@ -1,5 +1,5 @@
-import { SCHEDULER } from "~/context.ts";
+import { ASYNCSCHEDULER } from "~/context.ts";
 
 export function tick() {
-  SCHEDULER.runEffects();
+  ASYNCSCHEDULER.runEffects();
 }

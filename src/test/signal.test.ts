@@ -1,18 +1,8 @@
-import { createSignal, setScheduling } from "#/mod.ts";
+import { createSignal } from "#/mod.ts";
 
-import {
-  assertInstanceOf,
-  assertStrictEquals,
-  beforeAll,
-  describe,
-  it,
-} from "./util.ts";
+import { assertInstanceOf, assertStrictEquals, describe, it } from "./util.ts";
 
 describe("signal", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("should store and return value on read", () => {
     const $a = createSignal(10);
 

@@ -1,19 +1,14 @@
 import type { Owner } from "~/objects/owner.ts";
-import {
-  AsyncScheduler,
-  ScheduleMethod,
-  Scheduler,
-  SyncScheduler,
-} from "~/scheduler.ts";
 import { Effect } from "~/objects/effect.ts";
 import { Observer } from "../mod.ts";
+import { AsyncScheduler } from "./scheduler.ts";
 
 let CURRENTOWNER: Owner | undefined;
 let CURRENTOBSERVER: Observer<any> | undefined;
-let SCHEDULER: Scheduler = new SyncScheduler();
 let BATCH: Effect<any>[] | undefined;
+const ASYNCSCHEDULER = new AsyncScheduler();
 
-export { BATCH, CURRENTOBSERVER, CURRENTOWNER, SCHEDULER };
+export { ASYNCSCHEDULER, BATCH, CURRENTOBSERVER, CURRENTOWNER };
 
 function setOwner(owner: typeof CURRENTOWNER) {
   CURRENTOWNER = owner;
@@ -28,18 +23,6 @@ function setBatch(batch: typeof BATCH) {
 }
 
 export { setBatch, setObserver, setOwner };
-
-export function setScheduling(scheduleMethod: ScheduleMethod) {
-  if (SCHEDULER.method === scheduleMethod) {
-    return;
-  }
-
-  const NewScheduler = scheduleMethod === "sync"
-    ? SyncScheduler
-    : AsyncScheduler;
-
-  SCHEDULER = new NewScheduler();
-}
 
 export const STATE_CLEAN = 1;
 export const STATE_CHECK = 2;

@@ -6,6 +6,7 @@ import {
   type Owner,
   setContext,
 } from "#/mod.ts";
+import { tick } from "../methods/tick.ts";
 import { assertStrictEquals, describe, it } from "./util.ts";
 describe("context", () => {
   it("should get context value", () => {
@@ -47,6 +48,8 @@ describe("context", () => {
         });
       });
     });
+
+    tick();
 
     createRoot(() => {
       assertStrictEquals(getContext(key), undefined);

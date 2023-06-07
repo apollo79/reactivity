@@ -2,7 +2,8 @@ import { createSignal } from "~/methods/createSignal.ts";
 import { CURRENTOBSERVER } from "../context.ts";
 
 const $PROXY = Symbol("Proxy");
-const $NODE = Symbol("DataNodes");
+const $RAW = Symbol("ProxyRaw");
+const $NODE = Symbol("ProxyDataNodes");
 
 const UNREACTIVE_KEYS = new Set([
   "__proto__",
@@ -88,7 +89,13 @@ function getDataNode(
 
 const proxyTraps: ProxyHandler<StoreNode> = {
   get(target, property, receiver) {
-    if (property === $PROXY) return receiver;
+    if (property === $RAW) {
+      return target;
+    }
+
+    if (property === $PROXY) {
+      return receiver;
+    }
 
     const nodes = getDataNodes(target);
 
@@ -221,7 +228,7 @@ function setStorePath(
       return;
     } else if (path.length > 1) {
       setStorePath(current[part], path, [...traversed, part]);
-      
+
       return;
     }
 

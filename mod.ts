@@ -13,7 +13,6 @@ export { untrack } from "~/methods/untrack.ts";
 export { onDispose } from "~/methods/onDispose.ts";
 export { catchError } from "~/methods/catchError.ts";
 export { tick } from "~/methods/tick.ts";
-export { setScheduling } from "~/context.ts";
 
 export function getOwner(): Owner | undefined {
   return Owner.getOwner();

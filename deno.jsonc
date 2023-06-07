@@ -1,6 +1,9 @@
 {
   "fmt": {
-    "indentWidth": 2
+    "indentWidth": 2,
+    "exclude": [
+      "./cov_profile/"
+    ]
   },
   "tasks": {
     "test": "deno test --parallel --coverage=cov_profile",

@@ -1,9 +1,7 @@
 import { Observer } from "~/objects/observer.ts";
 import {
-  BATCH,
   type CacheState,
   CURRENTOBSERVER,
-  SCHEDULER,
   STATE_DIRTY,
   STATE_DISPOSED,
 } from "~/context.ts";
@@ -90,10 +88,6 @@ export class Observable<T = unknown> {
 
       // notify computations about the new value
       this.stale(STATE_DIRTY);
-
-      if (!BATCH) {
-        SCHEDULER.flush();
-      }
     }
 
     return this.value;

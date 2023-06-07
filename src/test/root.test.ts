@@ -6,24 +6,19 @@ import {
   createSignal,
   getOwner,
   onDispose,
-  setScheduling,
   type Signal,
+  tick,
 } from "#/mod.ts";
 import {
   assertSpyCallArg,
   assertSpyCalls,
   assertStrictEquals,
-  beforeAll,
   describe,
   it,
   spy,
 } from "./util.ts";
 
 describe("root", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("should dispose of inner computations", () => {
     const computeB = spy();
 
@@ -74,12 +69,13 @@ describe("root", () => {
       });
     });
 
+    tick();
     assertSpyCallArg(innerEffect, 0, 0, 0);
     assertSpyCalls(innerEffect, 1);
 
     stop();
-
     $a.set(10);
+    tick();
     assertSpyCalls(innerEffect, 2);
   });
 
@@ -97,6 +93,7 @@ describe("root", () => {
     assertSpyCalls(rootCall, 1);
 
     $a!.set(1);
+    tick();
     assertSpyCalls(rootCall, 1);
   });
 

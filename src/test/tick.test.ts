@@ -1,11 +1,7 @@
-import { createEffect, createSignal, setScheduling, tick } from "#/mod.ts";
-import { assertSpyCalls, beforeAll, describe, it, spy } from "./util.ts";
+import { createEffect, createSignal, tick } from "#/mod.ts";
+import { assertSpyCalls, describe, it, spy } from "./util.ts";
 
 describe("tick", () => {
-  beforeAll(() => {
-    setScheduling("async");
-  });
-
   it("should batch updates", () => {
     const $a = createSignal(10);
     const $effect = spy(() => void $a());
@@ -16,9 +12,9 @@ describe("tick", () => {
     $a.set(30);
     $a.set(40);
 
-    assertSpyCalls($effect, 1);
+    assertSpyCalls($effect, 0);
     tick();
-    assertSpyCalls($effect, 2);
+    assertSpyCalls($effect, 1);
   });
 
   it("should wait for queue to flush", () => {
@@ -27,15 +23,15 @@ describe("tick", () => {
 
     createEffect($effect);
 
-    assertSpyCalls($effect, 1);
+    assertSpyCalls($effect, 0);
 
     $a.set(20);
     tick();
-    assertSpyCalls($effect, 2);
+    assertSpyCalls($effect, 1);
 
     $a.set(30);
     tick();
-    assertSpyCalls($effect, 3);
+    assertSpyCalls($effect, 2);
   });
 
   it("should not fail if called while flushing", () => {
@@ -49,10 +45,10 @@ describe("tick", () => {
       $effect();
     });
 
-    assertSpyCalls($effect, 1);
+    assertSpyCalls($effect, 0);
 
     $a.set(20);
     tick();
-    assertSpyCalls($effect, 2);
+    assertSpyCalls($effect, 1);
   });
 });

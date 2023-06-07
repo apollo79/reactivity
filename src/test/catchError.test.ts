@@ -8,21 +8,11 @@ import {
   createMemo,
   createRoot,
   createSignal,
-  setScheduling,
+  tick,
 } from "#/mod.ts";
-import {
-  assertStrictEquals,
-  assertThrows,
-  beforeAll,
-  describe,
-  it,
-} from "./util.ts";
+import { assertStrictEquals, assertThrows, describe, it } from "./util.ts";
 
 describe("catchError", () => {
-  beforeAll(() => {
-    setScheduling("sync");
-  });
-
   it("No Handler", () => {
     assertThrows(
       () =>
@@ -45,6 +35,8 @@ describe("catchError", () => {
       );
     });
 
+    tick();
+
     assertStrictEquals(errored, true);
   });
 
@@ -61,6 +53,8 @@ describe("catchError", () => {
         );
       });
     });
+
+    tick();
 
     assertStrictEquals(errored, true);
   });
@@ -103,6 +97,8 @@ describe("catchError", () => {
       s.set(1);
     });
 
+    tick();
+
     assertStrictEquals(errored, true);
   });
 
@@ -122,6 +118,7 @@ describe("catchError", () => {
       });
     });
 
+    tick();
     assertStrictEquals(errored, true);
   });
 
@@ -148,6 +145,8 @@ describe("catchError", () => {
       s.set(1);
     });
 
+    tick();
+
     assertStrictEquals(errored, true);
   });
 
@@ -173,6 +172,8 @@ describe("catchError", () => {
       s.set(1);
     });
 
+    tick();
+
     assertStrictEquals(errored, true);
   });
 
@@ -192,6 +193,8 @@ describe("catchError", () => {
 
       m();
     });
+
+    tick();
 
     assertStrictEquals(errored, true);
   });
