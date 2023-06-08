@@ -31,9 +31,9 @@ export type ObservableOptions<T> = {
 };
 
 export type SignalOptions<T> = ObservableOptions<T>;
-export type Signal<T> = Accessor<T> & {
+export interface Signal<T> extends Accessor<T> {
   set: Setter<T>;
-};
+}
 
 // OWNER
 export type CleanupFunction = () => void;
@@ -72,3 +72,6 @@ export type OnEffectFunction<S, Prev, Next extends Prev = Prev> = (
 ) => Next;
 
 export type OnOptions = { defer: boolean };
+
+// BATCH
+export type BatchFunction<T> = () => T | Promise<T>;

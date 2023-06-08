@@ -1,11 +1,10 @@
 import type { Owner } from "~/objects/owner.ts";
-import { Effect } from "~/objects/effect.ts";
-import { Observer } from "../mod.ts";
+import type { Observer } from "../mod.ts";
 import { AsyncScheduler, SyncScheduler } from "./scheduler.ts";
 
 let CURRENTOWNER: Owner | undefined;
 let CURRENTOBSERVER: Observer<any> | undefined;
-let BATCH: Effect<any>[] | undefined;
+let BATCH: Promise<void> | undefined;
 const ASYNCSCHEDULER = new AsyncScheduler();
 const SYNCSCHEDULER = new SyncScheduler();
 

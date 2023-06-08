@@ -1,4 +1,4 @@
-import { STATE_CLEAN } from "~/context.ts";
+import { BATCH, STATE_CLEAN } from "~/context.ts";
 import { Effect } from "~/objects/effect.ts";
 
 /**
@@ -12,7 +12,7 @@ export abstract class Scheduler {
     this.#queue.push(effect);
   }
 
-  runEffects() {
+  flush() {
     if (this.#queue.length) {
       this.running = true;
 
@@ -28,7 +28,7 @@ export abstract class Scheduler {
       }
 
       // if nested effects were added, we execute them here
-      this.runEffects();
+      this.flush();
 
       this.running = false;
     }
@@ -48,14 +48,9 @@ export abstract class Scheduler {
       ancestors[i].updateIfNecessary();
     }
   }
-
-  abstract flush(): void;
 }
 
 export class SyncScheduler extends Scheduler {
-  override flush(): void {
-    this.runEffects();
-  }
 }
 
 /**
@@ -67,16 +62,16 @@ export class AsyncScheduler extends Scheduler {
   override schedule(effect: Effect<any>): void {
     super.schedule(effect);
 
-    this.flush();
+    this.queue();
   }
 
-  override runEffects(): void {
-    super.runEffects();
+  override flush(): void {
+    super.flush();
 
     this.scheduled = false;
   }
 
-  override flush(): void {
+  queue(): void {
     if (this.scheduled) {
       return;
     }
@@ -84,7 +79,11 @@ export class AsyncScheduler extends Scheduler {
     this.scheduled = true;
 
     queueMicrotask(() => {
-      this.runEffects();
+      if (BATCH) {
+        BATCH.finally(() => this.flush());
+      } else {
+        this.flush();
+      }
     });
   }
 }

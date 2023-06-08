@@ -13,6 +13,7 @@ describe("context", () => {
     const key = Symbol();
     createRoot(() => {
       setContext(key, 100);
+      
       createRoot(() => {
         createRoot(() => {
           setContext(key, 200);

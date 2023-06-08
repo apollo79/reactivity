@@ -6,7 +6,6 @@ import {
   tick,
 } from "#/mod.ts";
 import {
-  assertSpyCall,
   assertSpyCallArg,
   assertSpyCalls,
   assertStrictEquals,

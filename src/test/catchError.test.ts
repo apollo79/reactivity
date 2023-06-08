@@ -59,22 +59,6 @@ describe("catchError", () => {
     assertStrictEquals(errored, true);
   });
 
-  //   it("With multiple error handlers", () => {
-  //     let errored = false;
-  //     let errored2 = false;
-
-  //     createRoot(() => {
-  //       createEffect(() => {
-  //         onError(() => (errored = true));
-  //         onError(() => (errored2 = true));
-  //         throw "fail";
-  //       });
-  //     });
-
-  //     assertStrictEquals(errored, true);
-  //     assertStrictEquals(errored2, true);
-  //   });
-
   it("In update effect", () => {
     let errored = false;
 
