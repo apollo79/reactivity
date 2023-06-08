@@ -99,6 +99,7 @@ const proxyTraps: ProxyHandler<StoreNode> = {
 
     const nodes = getDataNodes(target);
 
+    // deno-lint-ignore no-prototype-builtins
     const isTracked = nodes.hasOwnProperty(property);
     let value = isTracked ? nodes[property]!() : target[property];
 
@@ -110,7 +111,9 @@ const proxyTraps: ProxyHandler<StoreNode> = {
       const descriptor = Object.getOwnPropertyDescriptor(target, property);
       if (
         CURRENTOBSERVER &&
-        (typeof value !== "function" || target.hasOwnProperty(property)) &&
+        (typeof value !== "function" ||
+          // deno-lint-ignore no-prototype-builtins
+          target.hasOwnProperty(property)) &&
         !(descriptor && descriptor.get)
       ) {
         value = getDataNode(nodes, property, value)();
@@ -283,6 +286,7 @@ export function wrap<T extends StoreNode>(value: T): T {
   return proxy;
 }
 
+// deno-lint-ignore ban-types
 export function createStore<T extends object>(
   object: T,
 ): [T, (...path: [...any[], any]) => void] {

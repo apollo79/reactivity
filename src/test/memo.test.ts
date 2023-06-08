@@ -187,6 +187,7 @@ describe("memo", () => {
 
       catchError(() => {
         $a = createMemo(() => {
+          // deno-lint-ignore no-constant-condition
           if (1) throw Error();
           return "";
         }, "foo");

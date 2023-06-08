@@ -1,12 +1,4 @@
-import {
-  batch,
-  createEffect,
-  createMemo,
-  createRoot,
-  createSignal,
-  on,
-  untrack,
-} from "#/mod.ts";
+import { createMemo, createRoot } from "#/mod.ts";
 import { assertEquals, assertStrictEquals, describe, it } from "~/test/util.ts";
 import {
   createStore,
@@ -41,6 +33,7 @@ describe("State immutablity", () => {
 
 describe("State Getters", () => {
   it("Testing an update from state", () => {
+    // deno-lint-ignore ban-types
     let state: any, setState: Function;
     createRoot(() => {
       [state, setState] = createStore({
@@ -56,18 +49,24 @@ describe("State Getters", () => {
   });
 
   it("Testing an update from state", () => {
+    // deno-lint-ignore ban-types
     let state: any, setState: Function;
     createRoot(() => {
+      // deno-lint-ignore prefer-const
       let greeting: () => string;
+
       [state, setState] = createStore({
         name: "John",
         get greeting(): string {
           return greeting();
         },
       });
+
       greeting = createMemo(() => `Hi, ${state.name}`);
     });
+
     assertStrictEquals(state!.greeting, "Hi, John");
+
     setState!({ name: "Jake" });
     assertStrictEquals(state!.greeting, "Hi, Jake");
   });
@@ -189,7 +188,7 @@ describe("Array setState modes", () => {
   it("Update filterFn", () => {
     const [state, setState] = createStore([1, 2, 3, 4, 5]);
     setState(
-      (r, i) => Boolean(i % 2),
+      (_r, i) => Boolean(i % 2),
       (r, t) => {
         assertStrictEquals(typeof t[0], "number");
 
