@@ -1,6 +1,12 @@
 import { createSignal } from "~/methods/createSignal.ts";
 import { CURRENTOBSERVER } from "~/context.ts";
-import { DataNode, DataNodes, SetStoreFunction, StoreNode, Wrappable } from "./types.ts";
+import {
+  DataNode,
+  DataNodes,
+  SetStoreFunction,
+  StoreNode,
+  Wrappable,
+} from "./types.ts";
 
 export const $PROXY = Symbol("Proxy");
 export const $RAW = Symbol("ProxyRaw");
