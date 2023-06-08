@@ -1,9 +1,10 @@
 import { createSignal } from "~/methods/createSignal.ts";
-import { CURRENTOBSERVER } from "../context.ts";
+import { CURRENTOBSERVER } from "~/context.ts";
+import { DataNode, DataNodes, SetStoreFunction, StoreNode, Wrappable } from "./types.ts";
 
-const $PROXY = Symbol("Proxy");
-const $RAW = Symbol("ProxyRaw");
-const $NODE = Symbol("ProxyDataNodes");
+export const $PROXY = Symbol("Proxy");
+export const $RAW = Symbol("ProxyRaw");
+export const $NODE = Symbol("ProxyDataNodes");
 
 const UNREACTIVE_KEYS = new Set([
   "__proto__",
@@ -22,20 +23,6 @@ const UNREACTIVE_KEYS = new Set([
   "valueOf",
   $NODE,
 ]);
-
-interface DataNode {
-  (): any;
-  set: (value?: any) => void;
-}
-
-type DataNodes = Record<PropertyKey, DataNode | undefined>;
-
-interface StoreNode {
-  [$NODE]?: DataNodes;
-  [key: PropertyKey]: any;
-}
-
-export type Wrappable = Record<string | number | symbol, any>;
 
 export function isWrappable(value: unknown): value is Wrappable {
   if (value === null || typeof value !== "object") {
@@ -194,7 +181,7 @@ function setStoreArray(
 
 function setStorePath(
   current: StoreNode,
-  path: [...any[], any],
+  path: any[],
   traversed?: PropertyKey[],
 ): void {
   let part;
@@ -289,9 +276,9 @@ export function wrap<T extends StoreNode>(value: T): T {
 // deno-lint-ignore ban-types
 export function createStore<T extends object>(
   object: T,
-): [T, (...path: [...any[], any]) => void] {
+): [get: T, set: SetStoreFunction<T>] {
   const wrappedStore = wrap(object);
-  const setStore = (...path: [...any[], any]) => {
+  const setStore = (...path: any[]) => {
     if (Array.isArray(object) && path.length === 1) {
       setStoreArray(object, path[0]);
     } else {
