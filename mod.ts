@@ -28,9 +28,7 @@ export type {
   Accessor,
   EffectFunction,
   EffectOptions,
-  Setter,
   Signal,
   SignalOptions,
 } from "~/types.ts";
 export type { Owner } from "~/objects/owner.ts";
-export type { Observer } from "~/objects/observer.ts";

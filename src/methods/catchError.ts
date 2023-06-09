@@ -3,9 +3,9 @@ import { Owner } from "~/objects/owner.ts";
 import { ErrorFunction } from "~/types.ts";
 
 export function catchError(tryFn: () => void, handler: ErrorFunction) {
-  const scope = new Owner();
+  const owner = new Owner();
 
-  scope.contexts[ERRORHANDLER_SYMBOL] = handler;
+  owner.contexts[ERRORHANDLER_SYMBOL] = handler;
 
-  return Owner.runWithOwner(tryFn, scope, undefined);
+  return Owner.runWithOwner(tryFn, owner, undefined);
 }

@@ -1,6 +1,6 @@
 import type { Owner } from "~/objects/owner.ts";
-import type { Observer } from "../mod.ts";
-import { AsyncScheduler, SyncScheduler } from "./scheduler.ts";
+import type { Observer } from "~/objects/observer.ts";
+import { AsyncScheduler, SyncScheduler } from "~/scheduler.ts";
 
 let CURRENTOWNER: Owner | undefined;
 let CURRENTOBSERVER: Observer<any> | undefined;
