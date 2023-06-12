@@ -7,7 +7,7 @@ import type { CacheState, MemoOptions, ObserverFunction } from "~/types.ts";
  * A memo is a computation that stores the last return value of its execution as observable so it can be depended on
  */
 export class Memo<T> extends Observer<T> {
-  prevValue: Observable<T>;
+  currentValue: Observable<T>;
   declare readonly sync?: false;
 
   constructor(
@@ -17,15 +17,15 @@ export class Memo<T> extends Observer<T> {
   ) {
     super(fn);
 
-    this.prevValue = new Observable(init, options);
-    this.prevValue.parent = this;
+    this.currentValue = new Observable(init, options);
+    this.currentValue.parent = this;
   }
 
   override update(): void {
-    const result = super.run(this.prevValue.value);
+    const result = super.run(this.currentValue.value);
 
     if (result !== ERRORTHROWN_SYMBOL) {
-      this.prevValue.write(result);
+      this.currentValue.write(result);
     }
   }
 
@@ -41,6 +41,6 @@ export class Memo<T> extends Observer<T> {
     this.state = newState;
 
     // notify observers
-    this.prevValue.stale(STATE_CHECK);
+    this.currentValue.stale(STATE_CHECK);
   }
 }

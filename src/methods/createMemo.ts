@@ -19,13 +19,13 @@ export function createMemo<Next extends Prev, Init, Prev>(
   value?: Init,
   options?: MemoOptions<Next>,
 ): ReadonlySignal<Next> {
-  const { prevValue } = new Memo<Init | Next>(
+  const { currentValue } = new Memo<Init | Next>(
     fn,
     value,
     options as MemoOptions<Init | Next>,
   );
 
-  const accessor = prevValue.read.bind(prevValue) as ReadonlySignal<Next>;
+  const accessor = currentValue.read.bind(currentValue) as ReadonlySignal<Next>;
 
   return accessor;
 }

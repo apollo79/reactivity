@@ -1,5 +1,5 @@
-import { CURRENTOWNER, ERRORTHROWN_SYMBOL } from "./src/context.ts";
-import { Owner } from "./src/objects/owner.ts";
+import { CURRENTOWNER, ERRORTHROWN_SYMBOL } from "~/context.ts";
+import { Owner } from "~/objects/owner.ts";
 
 export { createSignal } from "~/methods/createSignal.ts";
 export { createEffect } from "~/methods/createEffect.ts";
@@ -13,6 +13,7 @@ export { untrack } from "~/methods/untrack.ts";
 export { onDispose } from "~/methods/onDispose.ts";
 export { catchError } from "~/methods/catchError.ts";
 export { tick } from "~/methods/tick.ts";
+export { createSelector } from "~/methods/createSelector.ts";
 
 export function getOwner(): Owner | undefined {
   return Owner.getOwner();

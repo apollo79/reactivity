@@ -76,3 +76,6 @@ export type OnOptions = { defer: boolean };
 
 // BATCH
 export type BatchFunction<T> = () => T | Promise<T>;
+
+// SELECTOR
+export type SelectorEqualsFunction<T, U> = (key: U, source: T) => boolean;
