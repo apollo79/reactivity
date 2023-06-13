@@ -51,6 +51,12 @@ export function isWrappable(value: unknown): value is Wrappable {
   return Reflect.getPrototypeOf(prototype) === null;
 }
 
+/**
+ * Gets the DataNodes registered on a store or creates them if there are none
+ * There is one DataNode, a signal, for each property that has been accessed
+ * @param target
+ * @returns
+ */
 function getDataNodes(target: StoreNode): DataNodes {
   let nodes = target[$NODE];
 
@@ -62,6 +68,13 @@ function getDataNodes(target: StoreNode): DataNodes {
   return nodes;
 }
 
+/**
+ * Gets a specific DataNode or creates it if it isn't registered already
+ * @param nodes The object containing the DataNodes
+ * @param property The DataNode's property name
+ * @param value The value to initialize the DataNode if it isn't registered as DataNode already
+ * @returns
+ */
 function getDataNode(
   nodes: DataNodes,
   property: PropertyKey,
@@ -92,16 +105,21 @@ const proxyTraps: ProxyHandler<StoreNode> = {
 
     const nodes = getDataNodes(target);
 
+    // check if the property is already tracked, and therefore is registered on the nodes object
     // deno-lint-ignore no-prototype-builtins
     const isTracked = nodes.hasOwnProperty(property);
+
     let value = isTracked ? nodes[property]!() : target[property];
 
+    // Some keys like `prototype` we do not want to track and just return the value from the original object
     if (UNREACTIVE_KEYS.has(property)) {
       return value;
     }
 
     if (!isTracked) {
       const descriptor = Object.getOwnPropertyDescriptor(target, property);
+
+      // if there is no observer, there is no need to track the property now and we can use the value of the original object we got above
       if (
         CURRENTOBSERVER &&
         (typeof value !== "function" ||
@@ -113,6 +131,7 @@ const proxyTraps: ProxyHandler<StoreNode> = {
       }
     }
 
+    // If we are accessing an object or array, we need to deeply track it
     return isWrappable(value) ? wrap(value) : value;
   },
   set() {
@@ -134,6 +153,7 @@ function setProperty(current: StoreNode, property: PropertyKey, value: any) {
     const prevValue = current[property];
     current[property] = value;
 
+    // get the corresponding DataNode, initialized with the previous value if it doesn't exist
     const node = getDataNode(getDataNodes(current), property, prevValue);
 
     // prevent that if value is a function it gets executed as setter function
@@ -168,6 +188,7 @@ function setStoreArray(
       return;
     }
 
+    // store the array length so if the new array is shorter than the previous one, we can update the length
     const nextLength = next.length;
 
     for (let i = 0; i < nextLength; i++) {
@@ -181,6 +202,7 @@ function setStoreArray(
       setProperty(current, "length", nextLength);
     }
   } else {
+    // if the new value is an object, we need to merge it with the previous one
     mergeStoreNode(current, next);
   }
 }
@@ -190,23 +212,30 @@ function setStorePath(
   path: any[],
   traversed?: PropertyKey[],
 ): void {
+  // The current part of the path
   let part;
   let prevValue = current;
+  // The already traversed path
   traversed ??= [];
 
+  // The last part of the path is the value we want to set
   if (path.length > 1) {
     part = path.shift();
 
     const partType = typeof part;
     const isArray = Array.isArray(current);
 
+    // sets the rest of the path for each of the properties or indexes given in the array
+    // e.g. setStore("data", [1, 3, 4], "finished", (isFinished) => !isFinished)
     if (Array.isArray(part)) {
       for (let i = 0; i < part.length; i++) {
         setStorePath(current, [part[i], ...path], [...traversed, i]);
       }
 
       return;
-    } else if (isArray && partType === "function") {
+    } // filters an array based on the given function and sets the rest of the path for each of the matching indexes
+    // e.g setStore("data", (task) => task.label.indcludes("cook"), "day", "tomorrow")
+    else if (isArray && partType === "function") {
       for (let i = 0; i < current.length; i++) {
         if (part(current[i], i)) {
           setStorePath(current, [i, ...path], [...traversed, i]);
@@ -214,7 +243,10 @@ function setStorePath(
       }
 
       return;
-    } else if (isArray && typeof part === "object") {
+    } 
+    // traverses an array from `from` to `to` with the step `step` and sets the rest of the path for the matching indexes
+    // e.g. setStore("data", { from: 2, to: 10, step: 2 }, "finished", (isFinished) => !isFinished)
+    else if (isArray && typeof part === "object") {
       const { from = 0, to = current.length, step = 1 } = part;
 
       for (let i = from; i < to; i += step) {
@@ -222,7 +254,9 @@ function setStorePath(
       }
 
       return;
-    } else if (path.length > 1) {
+    } 
+    // sets the rest of the path for the given property, just goes deeper if the next part of the path is not the last one which means it is the value to set eventually
+    else if (path.length > 1) {
       setStorePath(current[part], path, [...traversed, part]);
 
       return;
@@ -242,6 +276,7 @@ function setStorePath(
     return;
   }
 
+  // merge granuarly if both of the values are wrappable (objects or arrays)
   if (isWrappable(prevValue) && isWrappable(newValue)) {
     mergeStoreNode(prevValue, newValue);
     return;
@@ -250,6 +285,11 @@ function setStorePath(
   setProperty(current, part, newValue);
 }
 
+/**
+ * wraps an object or array in a proxy
+ * @param value the object or array
+ * @returns 
+ */
 export function wrap<T extends StoreNode>(value: T): T {
   let proxy: T = value[$PROXY];
 
@@ -267,6 +307,7 @@ export function wrap<T extends StoreNode>(value: T): T {
       const key = keys[i];
       const descriptor = descriptors[key];
 
+      // if the property is a getter, bind it to the proxy
       if (descriptor.get) {
         Reflect.defineProperty(value, key, {
           enumerable: descriptor.enumerable,
