@@ -93,9 +93,7 @@ export function unwrap<T>(item: any, set = new Set()): T {
     const keys = Object.keys(item);
     const desc = Object.getOwnPropertyDescriptors(item);
 
-    for (let i = 0; i < keys.length; i++) {
-      const propertyName = keys[i];
-
+    for (const propertyName of keys) {
       if (desc[propertyName].get) {
         continue;
       }
@@ -175,7 +173,7 @@ const proxyTraps: ProxyHandler<StoreNode> = {
 
     if (property === $TRACKTOPLEVEL) {
       trackTopLevel(target);
-      
+
       return receiver;
     }
 
@@ -185,7 +183,7 @@ const proxyTraps: ProxyHandler<StoreNode> = {
     // deno-lint-ignore no-prototype-builtins
     const isTracked = nodes.hasOwnProperty(property);
 
-    let value = isTracked ? nodes[property]!() : target[property];
+    let value = isTracked ? nodes[property]!() : Reflect.get(target, property);
 
     // Some keys like `prototype` we do not want to track and just return the value from the original object
     if (UNREACTIVE_KEYS.has(property)) {
@@ -213,6 +211,11 @@ const proxyTraps: ProxyHandler<StoreNode> = {
   set() {
     console.warn("Cannot mutate a store directly!");
     return true;
+  },
+  has(target, property) {
+    trackTopLevel(target);
+
+    return Reflect.has(target, property);
   },
   deleteProperty() {
     console.warn("Cannot mutate a Store directly");

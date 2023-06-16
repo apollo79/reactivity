@@ -6,7 +6,7 @@ import {
   on,
 } from "#/mod.ts";
 import {
-assert,
+  assert,
   assertEquals,
   assertNotStrictEquals,
   assertStrictEquals,
@@ -445,6 +445,7 @@ describe("Tracking State changes", () => {
     createRoot(() => {
       createEffect(() => {
         const keys = Object.keys(state.obj);
+
         if (executionCount === 0) {
           assertStrictEquals(keys.length, 0);
         } else if (executionCount === 1) {
