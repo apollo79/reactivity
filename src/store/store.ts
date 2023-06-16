@@ -8,9 +8,10 @@ import {
   Wrappable,
 } from "./types.ts";
 
-export const $PROXY = Symbol("Proxy");
+export const $STORE = Symbol("Proxy");
 export const $RAW = Symbol("ProxyRaw");
 export const $NODE = Symbol("ProxyDataNodes");
+export const $TRACKTOPLEVEL = Symbol("ProxyTrackTopLevel");
 
 const UNREACTIVE_KEYS = new Set([
   "__proto__",
@@ -30,18 +31,19 @@ const UNREACTIVE_KEYS = new Set([
   $NODE,
 ]);
 
+export function isStore(value: unknown): boolean {
+  return typeof value === "object" && value !== null && $STORE in value;
+}
+
 export function isWrappable(value: unknown): value is Wrappable {
   if (value === null || typeof value !== "object") {
     return false;
   }
 
-  if ($PROXY in value) {
+  if ($STORE in value) {
     return true;
   }
 
-  // if (SYMBOL_STORE_UNTRACKED in value) return false;
-
-  // TODO: support for arrays (length property has some tricky parts!)
   if (Array.isArray(value)) return true;
 
   const prototype = Reflect.getPrototypeOf(value);
@@ -49,6 +51,66 @@ export function isWrappable(value: unknown): value is Wrappable {
   if (prototype === null) return true;
 
   return Reflect.getPrototypeOf(prototype) === null;
+}
+
+export function unwrap<T>(item: T, set?: Set<unknown>): T;
+export function unwrap<T>(item: any, set = new Set()): T {
+  if (item !== null) {
+    const raw = item[$RAW];
+
+    if (raw != undefined) {
+      return raw;
+    }
+  }
+
+  if (!isWrappable(item) || set.has(item)) {
+    return item;
+  }
+
+  if (Array.isArray(item)) {
+    if (Object.isFrozen(item)) {
+      item = item.slice(0);
+    } else {
+      set.add(item);
+    }
+
+    for (let i = 0; i < item.length; i++) {
+      const value = item[i];
+
+      const unwrappedValue = unwrap(value, set);
+
+      if (value !== unwrappedValue) {
+        item[i] = unwrappedValue;
+      }
+    }
+  } else {
+    if (Object.isFrozen(item)) {
+      item = Object.assign({}, item);
+    } else {
+      set.add(item);
+    }
+
+    const keys = Object.keys(item);
+    const desc = Object.getOwnPropertyDescriptors(item);
+
+    for (let i = 0; i < keys.length; i++) {
+      const propertyName = keys[i];
+
+      if (desc[propertyName].get) {
+        continue;
+      }
+
+      const value = item[propertyName];
+
+      const unwrappedValue = unwrap(value, set);
+
+      if (value !== unwrappedValue) {
+        item[propertyName] = unwrappedValue;
+      }
+    }
+  }
+
+  return item;
 }
 
 /**
@@ -93,13 +155,27 @@ function getDataNode(
   return node;
 }
 
+function trackTopLevel(target: StoreNode) {
+  if (CURRENTOBSERVER) {
+    const nodes = getDataNodes(target);
+
+    getDataNode(nodes, $TRACKTOPLEVEL)();
+  }
+}
+
 const proxyTraps: ProxyHandler<StoreNode> = {
   get(target, property, receiver) {
     if (property === $RAW) {
       return target;
     }
 
-    if (property === $PROXY) {
+    if (property === $STORE) {
+      return receiver;
+    }
+
+    if (property === $TRACKTOPLEVEL) {
+      trackTopLevel(target);
+      
       return receiver;
     }
 
@@ -142,22 +218,64 @@ const proxyTraps: ProxyHandler<StoreNode> = {
     console.warn("Cannot mutate a Store directly");
     return true;
   },
+  ownKeys(target) {
+    trackTopLevel(target);
+
+    return Reflect.ownKeys(target);
+  },
+  getOwnPropertyDescriptor(target, property) {
+    const descriptor = Reflect.getOwnPropertyDescriptor(target, property);
+
+    if (
+      !descriptor ||
+      // if there is a getter we don't want to overwrite it
+      descriptor.get ||
+      // we can only delete `writable` if the descriptor is configurable
+      !descriptor.configurable ||
+      property === $RAW ||
+      property === $STORE ||
+      property === $NODE
+    ) {
+      return descriptor;
+    }
+
+    // we are only allowed to set a getter if the descriptor has no value and writable properties
+    delete descriptor.value;
+    delete descriptor.writable;
+    descriptor.get = () => target[$STORE][property];
+
+    return descriptor;
+  },
 };
 
 function setProperty(current: StoreNode, property: PropertyKey, value: any) {
-  // const prevLength = current[property].length;
+  const prevLength = current.length;
 
   if (value === undefined) {
     delete current[property];
   } else {
+    const nodes = getDataNodes(current);
     const prevValue = current[property];
     current[property] = value;
 
     // get the corresponding DataNode, initialized with the previous value if it doesn't exist
-    const node = getDataNode(getDataNodes(current), property, prevValue);
+    const node = getDataNode(nodes, property, prevValue);
 
     // prevent that if value is a function it gets executed as setter function
     node.set(() => value);
+
+    const nextLength = current.length;
+
+    // TODO: Figure out why there are problems with array length
+    if (Array.isArray(current) && nextLength !== prevLength) {
+      getDataNode(nodes, "length", prevLength).set(nextLength);
+    }
+
+    const topLevelNode = getDataNode(nodes, $TRACKTOPLEVEL);
+
+    if (topLevelNode) {
+      topLevelNode.set();
+    }
   }
 }
 
@@ -198,7 +316,7 @@ function setStoreArray(
       }
     }
 
-    if (current.length !== nextLength) {
+    if (current.length < nextLength) {
       setProperty(current, "length", nextLength);
     }
   } else {
@@ -243,8 +361,7 @@ function setStorePath(
       }
 
       return;
-    } 
-    // traverses an array from `from` to `to` with the step `step` and sets the rest of the path for the matching indexes
+    } // traverses an array from `from` to `to` with the step `step` and sets the rest of the path for the matching indexes
     // e.g. setStore("data", { from: 2, to: 10, step: 2 }, "finished", (isFinished) => !isFinished)
     else if (isArray && typeof part === "object") {
       const { from = 0, to = current.length, step = 1 } = part;
@@ -254,8 +371,7 @@ function setStorePath(
       }
 
       return;
-    } 
-    // sets the rest of the path for the given property, just goes deeper if the next part of the path is not the last one which means it is the value to set eventually
+    } // sets the rest of the path for the given property, just goes deeper if the next part of the path is not the last one which means it is the value to set eventually
     else if (path.length > 1) {
       setStorePath(current[part], path, [...traversed, part]);
 
@@ -288,15 +404,15 @@ function setStorePath(
 /**
  * wraps an object or array in a proxy
  * @param value the object or array
- * @returns 
+ * @returns
  */
 export function wrap<T extends StoreNode>(value: T): T {
-  let proxy: T = value[$PROXY];
+  let proxy: T = value[$STORE];
 
   if (!proxy) {
     proxy = new Proxy<T>(value, proxyTraps);
 
-    Reflect.defineProperty(value, $PROXY, {
+    Reflect.defineProperty(value, $STORE, {
       value: proxy,
     });
 
