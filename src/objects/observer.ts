@@ -1,4 +1,5 @@
 import {
+  CURRENTOWNER,
   ERRORTHROWN_SYMBOL,
   STATE_CHECK,
   STATE_CLEAN,
@@ -6,7 +7,8 @@ import {
 } from "~/context.ts";
 import { Owner } from "~/objects/owner.ts";
 import { type Observable } from "~/objects/observable.ts";
-import { CacheState, ObserverFunction } from "~/types.ts";
+import { CacheState, Contexts, ObserverFunction } from "~/types.ts";
+import { EMPTY_CONTEXT } from "~/context.ts";
 
 /**
  * A computation is a scope and the abstraction over effects and memos.
@@ -16,6 +18,7 @@ export abstract class Observer<T> extends Owner {
   readonly sources = new Set<Observable<any>>();
   readonly fn: ObserverFunction<undefined | T, T>;
   readonly sync?: boolean;
+  contexts: Contexts = CURRENTOWNER?.contexts || EMPTY_CONTEXT;
 
   constructor(fn: ObserverFunction<undefined | T, T>) {
     super();

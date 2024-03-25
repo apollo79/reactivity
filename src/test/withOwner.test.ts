@@ -1,11 +1,5 @@
-import {
-  createRoot,
-  getContext,
-  type Owner,
-  withOwner,
-  setContext,
-  catchError,
-} from "#/mod.ts";
+import { createRoot, getContext, withOwner, catchError } from "#/mod.ts";
+import { withContext } from "~/methods/withContext.ts";
 import {
   assertStrictEquals,
   describe,
@@ -18,9 +12,8 @@ describe("runWithOwner", () => {
   it("should scope function to current scope", () => {
     let runWith: ReturnType<typeof withOwner>;
 
-    createRoot(() => {
+    withContext({ id: 10 }, () => {
       runWith = withOwner();
-      setContext("id", 10);
     });
 
     runWith!(() => assertStrictEquals(getContext("id"), 10));

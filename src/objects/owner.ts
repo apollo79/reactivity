@@ -53,7 +53,7 @@ export class Owner {
    * stores contexts values and error handlers
    * @see onError.ts
    */
-  contexts: Contexts = {};
+  contexts?: Contexts;
   /**
    * The current state of the scope.
    */
@@ -82,7 +82,7 @@ export class Owner {
 
     this.disposal = [];
 
-    this.contexts = {};
+    // this.contexts = {};
   }
 
   /**
@@ -91,19 +91,6 @@ export class Owner {
    * @returns The context if found, else undefined
    */
   get<T>(id: string | symbol): T | undefined {
-    if (id in this.contexts) {
-      return this.contexts[id] as T;
-    } else {
-      return this.parentScope?.get(id);
-    }
-  }
-
-  /**
-   * Sets a context on this scope
-   * @param id The ID to register the context under
-   * @param value The value of the context
-   */
-  set(id: string | symbol, value: unknown): void {
-    this.contexts[id] = value;
+    return this.contexts?.[id] as T;
   }
 }

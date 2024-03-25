@@ -1,18 +1,19 @@
-import { createEffect, createRoot, getContext, setContext } from "#/mod.ts";
+import { createEffect, createRoot, getContext, withContext } from "#/mod.ts";
 import { assertStrictEquals, describe, it } from "./util.ts";
+
 describe("context", () => {
   it("should get context value", () => {
     const key = Symbol();
     createRoot(() => {
-      setContext(key, 100);
-
-      createRoot(() => {
+      withContext({ [key]: 100 }, () => {
         createRoot(() => {
-          setContext(key, 200);
-        });
+          createRoot(() => {
+            withContext({ [key]: 100 }, () => {});
+          });
 
-        createEffect(() => {
-          assertStrictEquals(getContext(key), 100);
+          createEffect(() => {
+            assertStrictEquals(getContext(key), 100);
+          });
         });
       });
     });

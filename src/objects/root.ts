@@ -1,6 +1,6 @@
 import { Owner } from "~/objects/owner.ts";
-import { ERRORTHROWN_SYMBOL } from "~/context.ts";
-import type { RootFunction } from "~/types.ts";
+import { CURRENTOWNER, EMPTY_CONTEXT, ERRORTHROWN_SYMBOL } from "~/context.ts";
+import type { Contexts, RootFunction } from "~/types.ts";
 
 /**
  * A root is a scope under which the provided callback is executed. It also passes the callback the `dispose` function for manual disposal.
@@ -9,6 +9,7 @@ import type { RootFunction } from "~/types.ts";
  */
 export class Root<T = unknown> extends Owner {
   fn: RootFunction<T>;
+  contexts: Contexts = CURRENTOWNER?.contexts || EMPTY_CONTEXT;
 
   constructor(fn: RootFunction<T>) {
     super();
@@ -22,7 +23,7 @@ export class Root<T = unknown> extends Owner {
     const result = Owner.runWithOwner(
       () => this.fn(this.dispose.bind(this)),
       this,
-      undefined,
+      undefined
     );
 
     return result === ERRORTHROWN_SYMBOL ? undefined! : result;

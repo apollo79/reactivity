@@ -1,6 +1,7 @@
 import type { Owner } from "~/objects/owner.ts";
 import type { Observer } from "~/objects/observer.ts";
 import { AsyncScheduler, SyncScheduler } from "~/scheduler.ts";
+import { Contexts } from "~/types.ts";
 
 let CURRENTOWNER: Owner | undefined;
 let CURRENTOBSERVER: Observer<any> | undefined;
@@ -28,6 +29,8 @@ export const STATE_CLEAN = 1;
 export const STATE_CHECK = 2;
 export const STATE_DIRTY = 3;
 export const STATE_DISPOSED = 4;
+
+export const EMPTY_CONTEXT: Contexts = {};
 
 export const ERRORHANDLER_SYMBOL = Symbol("Errorhandler");
 export const ERRORTHROWN_SYMBOL = Symbol("Error thrown");
