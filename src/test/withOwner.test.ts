@@ -1,11 +1,11 @@
-import { createRoot, getContext, withOwner, catchError } from "#/mod.ts";
+import { catchError, getContext, withOwner } from "#/mod.ts";
 import { withContext } from "~/methods/withContext.ts";
 import {
+  assertSpyCallArg,
   assertStrictEquals,
   describe,
   it,
   spy,
-  assertSpyCallArg,
 } from "./util.ts";
 
 describe("runWithOwner", () => {

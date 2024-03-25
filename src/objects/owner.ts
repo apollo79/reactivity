@@ -17,7 +17,7 @@ export class Owner {
   static runWithOwner<T>(
     fn: () => T,
     owner: typeof CURRENTOWNER,
-    observer: typeof CURRENTOBSERVER
+    observer: typeof CURRENTOBSERVER,
   ): T | typeof ERRORTHROWN_SYMBOL {
     const PREV_OWNER = CURRENTOWNER;
     const PREV_OBSERVER = CURRENTOBSERVER;

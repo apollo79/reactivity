@@ -23,7 +23,7 @@ export class Root<T = unknown> extends Owner {
     const result = Owner.runWithOwner(
       () => this.fn(this.dispose.bind(this)),
       this,
-      undefined
+      undefined,
     );
 
     return result === ERRORTHROWN_SYMBOL ? undefined! : result;

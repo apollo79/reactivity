@@ -7,5 +7,4 @@
   "editor.defaultFormatter": "denoland.vscode-deno",
   "deno.codeLens.implementations": true,
   "deno.codeLens.test": true,
-  "deno.testing.enable": true
 }
