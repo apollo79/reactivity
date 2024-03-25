@@ -22,7 +22,7 @@ describe("runWithOwner", () => {
   it("should return value", () => {
     assertStrictEquals(
       withOwner()(() => 100),
-      100
+      100,
     );
   });
 
