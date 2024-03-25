@@ -195,8 +195,7 @@ const proxyTraps: ProxyHandler<StoreNode> = {
       // if there is no observer, there is no need to track the property now and we can use the value of the original object we got above
       if (
         CURRENTOBSERVER &&
-        (typeof value !== "function" ||
-          Object.hasOwn(target, property)) &&
+        (typeof value !== "function" || Object.hasOwn(target, property)) &&
         !(descriptor && descriptor.get)
       ) {
         value = getDataNode(nodes, property, value)();
@@ -214,7 +213,8 @@ const proxyTraps: ProxyHandler<StoreNode> = {
     if (
       ([$RAW, $STORE, $TRACKTOPLEVEL, $NODE] as (string | symbol)[]).includes(
         property,
-      ) || UNREACTIVE_KEYS.has(property)
+      ) ||
+      UNREACTIVE_KEYS.has(property)
     ) {
       return true;
     }
@@ -446,7 +446,6 @@ export function wrap<T extends StoreNode>(value: T): T {
   return proxy;
 }
 
-// deno-lint-ignore ban-types
 export function createStore<T extends object>(
   object: T,
 ): [get: T, set: SetStoreFunction<T>] {
@@ -459,8 +458,5 @@ export function createStore<T extends object>(
     }
   };
 
-  return [
-    wrappedStore,
-    setStore,
-  ];
+  return [wrappedStore, setStore];
 }
