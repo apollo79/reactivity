@@ -1,17 +1,19 @@
 import { CURRENTOWNER } from "~/context.ts";
 import type { CleanupFunction } from "~/types.ts";
+import { noop } from "~/utils/noop.ts";
 
 export function onDispose(fn: CleanupFunction) {
   if (!CURRENTOWNER) {
-    return () => {};
+    return noop;
   }
 
   const owner = CURRENTOWNER;
 
-  owner?.disposal.push(fn);
+  owner.disposal.push(fn);
 
   return () => {
-    // if (owner?.state === STATE_DISPOSED) {
+    // if we wouldn't dispose on first run we could add this
+    // if (owner.state === STATE_DISPOSED) {
     //   return;
     // }
 

@@ -4,6 +4,7 @@ import {
   createRoot,
   createSignal,
   on,
+  tick,
 } from "#/mod.ts";
 import {
   assert,
@@ -14,13 +15,7 @@ import {
   fail,
   it,
 } from "~/test/util.ts";
-import {
-  createStore,
-  unwrap,
-  //  unwrap, $RAW,
-} from "../mod.ts";
-import { tick } from "../../methods/tick.ts";
-import { $RAW } from "../store.ts";
+import { $RAW, createStore, unwrap } from "../mod.ts";
 
 describe("State immutablity", () => {
   it("Setting a property", () => {

@@ -180,8 +180,7 @@ const proxyTraps: ProxyHandler<StoreNode> = {
     const nodes = getDataNodes(target);
 
     // check if the property is already tracked, and therefore is registered on the nodes object
-    // deno-lint-ignore no-prototype-builtins
-    const isTracked = nodes.hasOwnProperty(property);
+    const isTracked = Object.hasOwn(nodes, property);
 
     let value = isTracked ? nodes[property]!() : Reflect.get(target, property);
 
@@ -191,14 +190,13 @@ const proxyTraps: ProxyHandler<StoreNode> = {
     }
 
     if (!isTracked) {
-      const descriptor = Object.getOwnPropertyDescriptor(target, property);
+      const descriptor = Reflect.getOwnPropertyDescriptor(target, property);
 
       // if there is no observer, there is no need to track the property now and we can use the value of the original object we got above
       if (
         CURRENTOBSERVER &&
         (typeof value !== "function" ||
-          // deno-lint-ignore no-prototype-builtins
-          target.hasOwnProperty(property)) &&
+          Object.hasOwn(target, property)) &&
         !(descriptor && descriptor.get)
       ) {
         value = getDataNode(nodes, property, value)();
@@ -213,7 +211,16 @@ const proxyTraps: ProxyHandler<StoreNode> = {
     return true;
   },
   has(target, property) {
+    if (
+      ([$RAW, $STORE, $TRACKTOPLEVEL, $NODE] as (string | symbol)[]).includes(
+        property,
+      ) || UNREACTIVE_KEYS.has(property)
+    ) {
+      return true;
+    }
     trackTopLevel(target);
+
+    this.get!(target, property, target);
 
     return Reflect.has(target, property);
   },
@@ -235,9 +242,9 @@ const proxyTraps: ProxyHandler<StoreNode> = {
       descriptor.get ||
       // we can only delete `writable` if the descriptor is configurable
       !descriptor.configurable ||
-      property === $RAW ||
-      property === $STORE ||
-      property === $NODE
+      ([$RAW, $STORE, $TRACKTOPLEVEL, $NODE] as (string | symbol)[]).includes(
+        property,
+      )
     ) {
       return descriptor;
     }

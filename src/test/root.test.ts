@@ -4,7 +4,6 @@ import {
   createMemo,
   createRoot,
   createSignal,
-  getOwner,
   onDispose,
   type Signal,
   tick,
@@ -97,14 +96,14 @@ describe("root", () => {
     assertSpyCalls(rootCall, 1);
   });
 
-  it("should hold parent tracking", () => {
-    createRoot(() => {
-      const parent = getOwner();
-      createRoot(() => {
-        assertStrictEquals(getOwner()!.parentScope, parent);
-      });
-    });
-  });
+  // it("should hold parent tracking", () => {
+  //   createRoot(() => {
+  //     const parent = getOwner();
+  //     createRoot(() => {
+  //       assertStrictEquals(getOwner()!.parentScope, parent);
+  //     });
+  //   });
+  // });
 
   it("should not throw if dispose called during active disposal process", () => {
     createRoot((dispose) => {

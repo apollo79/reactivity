@@ -8,20 +8,16 @@ import {
   STATE_DISPOSED,
 } from "~/context.ts";
 import { handleError } from "~/utils/handleError.ts";
-import type { CacheState, CleanupFunction } from "~/types.ts";
+import type { CacheState, CleanupFunction, Contexts } from "~/types.ts";
 
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
  */
 export class Owner {
-  static getOwner(): Owner | undefined {
-    return CURRENTOWNER;
-  }
-
   static runWithOwner<T>(
     fn: () => T,
     owner: typeof CURRENTOWNER,
-    observer: typeof CURRENTOBSERVER,
+    observer: typeof CURRENTOBSERVER
   ): T | typeof ERRORTHROWN_SYMBOL {
     const PREV_OWNER = CURRENTOWNER;
     const PREV_OBSERVER = CURRENTOBSERVER;
@@ -57,7 +53,7 @@ export class Owner {
    * stores contexts values and error handlers
    * @see onError.ts
    */
-  contexts: Record<string | symbol, unknown> = {};
+  contexts: Contexts = {};
   /**
    * The current state of the scope.
    */

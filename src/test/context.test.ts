@@ -1,12 +1,4 @@
-import {
-  createEffect,
-  createRoot,
-  getContext,
-  getOwner,
-  type Owner,
-  setContext,
-} from "#/mod.ts";
-import { tick } from "../methods/tick.ts";
+import { createEffect, createRoot, getContext, setContext } from "#/mod.ts";
 import { assertStrictEquals, describe, it } from "./util.ts";
 describe("context", () => {
   it("should get context value", () => {
@@ -34,27 +26,6 @@ describe("context", () => {
           assertStrictEquals(getContext(key), undefined);
         });
       });
-    });
-  });
-
-  it("should use provided scope", () => {
-    let scope!: Owner;
-    const key = Symbol();
-
-    createRoot(() => {
-      scope = getOwner()!;
-      createRoot(() => {
-        createEffect(() => {
-          setContext(key, 200, scope);
-        });
-      });
-    });
-
-    tick();
-
-    createRoot(() => {
-      assertStrictEquals(getContext(key), undefined);
-      assertStrictEquals(getContext(key, scope), 200);
     });
   });
 });

@@ -45,7 +45,7 @@ export type RootFunction<T> = (dispose: () => void) => T;
 
 // OBSERVER
 export type ObserverFunction<Prev, Next extends Prev = Prev> = (
-  prevValue: Prev,
+  prevValue: Prev
 ) => Next;
 
 // EFFECT
@@ -63,13 +63,13 @@ export type MemoOptions<T> = ObservableOptions<T>;
 // ON
 // transforms a tuple to a tuple of accessors in a way that allows generics to be inferred
 export type AccessorArray<T> = [
-  ...Extract<{ [K in keyof T]: Accessor<T[K]> }, readonly unknown[]>,
+  ...Extract<{ [K in keyof T]: Accessor<T[K]> }, readonly unknown[]>
 ];
 
 export type OnEffectFunction<S, Prev, Next extends Prev = Prev> = (
   input: S,
   prevInput: S | undefined,
-  prev: Prev,
+  prev: Prev
 ) => Next;
 
 export type OnOptions = { defer: boolean };
@@ -79,3 +79,6 @@ export type BatchFunction<T> = () => T | Promise<T>;
 
 // SELECTOR
 export type SelectorEqualsFunction<T, U> = (key: U, source: T) => boolean;
+
+// CONTEXT
+export type Contexts = Record<string | symbol, unknown>;
