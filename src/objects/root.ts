@@ -19,7 +19,7 @@ export class Root<T = unknown> extends Owner {
   /**
    * Executes the provided callback with the root as scope
    */
-  wrap(): T {
+  runWith(): T {
     const result = Owner.runWithOwner(
       () => this.fn(this.dispose.bind(this)),
       this,

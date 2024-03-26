@@ -1,6 +1,7 @@
 import {
   CURRENTOBSERVER,
   CURRENTOWNER,
+  ERRORHANDLER_SYMBOL,
   ERRORTHROWN_SYMBOL,
   setObserver,
   setOwner,
@@ -8,7 +9,14 @@ import {
   STATE_DISPOSED,
 } from "~/context.ts";
 import { handleError } from "~/utils/handleError.ts";
-import type { CacheState, CleanupFunction, Contexts } from "~/types.ts";
+import type {
+  CacheState,
+  CleanupFunction,
+  Contexts,
+  ErrorFunction,
+} from "~/types.ts";
+import { SUSPENSE_SYMBOL } from "~/context.ts";
+import { Suspense } from "~/objects/suspense.ts";
 
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
@@ -84,6 +92,10 @@ export class Owner {
 
     // this.contexts = {};
   }
+
+  get(id: typeof SUSPENSE_SYMBOL): Suspense | undefined;
+
+  get(id: typeof ERRORHANDLER_SYMBOL): ErrorFunction | undefined;
 
   /**
    * Searches for the context registered under the given id. If it is not found it searches recursively up the scope-tree

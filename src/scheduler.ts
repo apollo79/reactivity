@@ -38,20 +38,28 @@ export abstract class Scheduler {
   runTop(node: Effect<any>) {
     const ancestors = [node];
 
+    // we traverse up the owner tree and find all effects with a `check` or `dirty` state and collect them
     while ((node = node.parentScope as Effect<any>)) {
       if (node?.state !== STATE_CLEAN) {
         ancestors.push(node);
       }
     }
 
+    // we run the effects in reverse order, meaning that the uppermost effect will be run first
     for (let i = ancestors.length - 1; i >= 0; i--) {
-      ancestors[i].updateIfNecessary();
+      // if the effect is currently suspended we don't run it
+      // TODO: Should we do this at a different place? Maybe in `updateIfNecessary`?
+      if (!ancestors[i].suspense?.suspended) {
+        ancestors[i].updateIfNecessary();
+      }
     }
   }
 }
 
-export class SyncScheduler extends Scheduler {
-}
+/**
+ * the sync scheduler is for `sync` effects. It gets flushed by an observable after all its observers have been marked
+ */
+export class SyncScheduler extends Scheduler {}
 
 /**
  * The async scheduler allows automatic batching by deferring the execution of effects to the next microtask

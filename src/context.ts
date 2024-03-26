@@ -34,3 +34,5 @@ export const EMPTY_CONTEXT: Contexts = {};
 
 export const ERRORHANDLER_SYMBOL = Symbol("Errorhandler");
 export const ERRORTHROWN_SYMBOL = Symbol("Error thrown");
+
+export const SUSPENSE_SYMBOL = Symbol("Suspense");

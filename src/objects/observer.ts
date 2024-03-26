@@ -74,7 +74,7 @@ export abstract class Observer<T> extends Owner {
         if ((this.state as CacheState) === STATE_DIRTY) {
           // Stop the loop here so we won't trigger updates on other parents unnecessarily
           // If our computation changes to no longer use some sources, we don't
-          // want to update() a source we used last time, but now don't use.
+          // want to update a source we used last time, but now don't use.
           break;
         }
       }
