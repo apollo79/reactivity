@@ -3,12 +3,12 @@ import { Contexts } from "~/types.ts";
 import { ERRORTHROWN_SYMBOL } from "~/context.ts";
 
 export class Context extends Owner {
-  contexts: Contexts;
+  context: Contexts;
 
   constructor(contexts: Contexts) {
     super();
 
-    this.contexts = { ...this.parentScope?.contexts, ...contexts };
+    this.context = { ...this.parentScope?.context, ...contexts };
   }
 
   runWith<T>(fn: () => T): T {

@@ -17,6 +17,7 @@ import type {
 } from "~/types.ts";
 import { SUSPENSE_SYMBOL } from "~/context.ts";
 import { Suspense } from "~/objects/suspense.ts";
+import { Root } from "~/objects/root.ts";
 
 /**
  * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
@@ -52,16 +53,22 @@ export class Owner {
   readonly parentScope: Owner | undefined = CURRENTOWNER;
   /**
    * Scopes that are created under this scope.
-   * This isneeded so when this scope is disposed, it can tell its children scopes to dispose themselves too
+   * This is needed so when this scope is disposed, it can tell its children scopes to dispose themselves too
    */
   readonly childrenScopes = new Set<Owner>();
+  /**
+   * Roots that are created under this scope
+   * Roots don't get disposed on parent disposal, but they need to register themselves for a parent suspense to be able to notify its children suspenses
+   */
+  readonly roots = new Set<Root>();
+
   /** Custom cleanup functions */
   disposal: CleanupFunction[] = [];
   /**
    * stores contexts values and error handlers
    * @see onError.ts
    */
-  contexts?: Contexts;
+  context?: Contexts;
   /**
    * The current state of the scope.
    */
@@ -103,6 +110,6 @@ export class Owner {
    * @returns The context if found, else undefined
    */
   get<T>(id: string | symbol): T | undefined {
-    return this.contexts?.[id] as T;
+    return this.context?.[id] as T;
   }
 }

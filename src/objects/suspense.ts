@@ -17,16 +17,24 @@ export class Suspense extends Owner {
    */
   public suspended: number;
 
-  contexts: Contexts = {
-    ...this.parentScope?.contexts,
+  context: Contexts = {
+    ...this.parentScope?.context,
     [SUSPENSE_SYMBOL]: this,
   };
 
   constructor() {
     super();
 
+    this.parentScope?.childrenScopes.add(this);
+
     // get the state of a maybe existing parent suspense
     this.suspended = this.parentScope?.get(SUSPENSE_SYMBOL)?.suspended ?? 0;
+  }
+
+  override dispose() {
+    super.dispose();
+
+    this.parentScope?.childrenScopes.delete(this);
   }
 
   toggle(suspended: boolean) {
@@ -57,29 +65,33 @@ export class Suspense extends Owner {
 }
 
 function notifyChildrenScopes(scope: Owner, suspended: boolean) {
-  for (const childrenScope of scope.childrenScopes) {
+  for (const childScope of scope.childrenScopes) {
     // notify children suspenses
-    if (childrenScope instanceof Suspense) {
-      childrenScope.toggle(suspended);
+    if (childScope instanceof Suspense) {
+      childScope.toggle(suspended);
     }
 
-    if (childrenScope instanceof Effect) {
+    if (childScope instanceof Effect) {
       // if the effect should have run if there was no suspense boundary, we now update / schedule it
       if (
-        childrenScope.state === STATE_CHECK ||
-        childrenScope.state === STATE_DIRTY
+        childScope.state === STATE_CHECK ||
+        childScope.state === STATE_DIRTY
       ) {
         // If `init` is true it means that this effect should be sync on first run
-        if (childrenScope.init) {
+        if (childScope.init) {
           // childrenScope.init = false;
 
-          childrenScope.update();
+          childScope.update();
         } else {
-          childrenScope.schedule();
+          childScope.schedule();
         }
       }
     }
 
-    notifyChildrenScopes(childrenScope, suspended);
+    notifyChildrenScopes(childScope, suspended);
+  }
+
+  for (const root of scope.roots) {
+    notifyChildrenScopes(root, suspended);
   }
 }

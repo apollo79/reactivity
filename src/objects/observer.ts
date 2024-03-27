@@ -1,5 +1,4 @@
 import {
-  CURRENTOWNER,
   ERRORTHROWN_SYMBOL,
   STATE_CHECK,
   STATE_CLEAN,
@@ -18,7 +17,7 @@ export abstract class Observer<T> extends Owner {
   readonly sources = new Set<Observable<any>>();
   readonly fn: ObserverFunction<undefined | T, T>;
   readonly sync?: boolean;
-  contexts: Contexts = CURRENTOWNER?.contexts || EMPTY_CONTEXT;
+  context: Contexts = this.parentScope?.context || EMPTY_CONTEXT;
 
   constructor(fn: ObserverFunction<undefined | T, T>) {
     super();

@@ -131,8 +131,14 @@ describe("suspense", () => {
   });
 
   it("should suspend children suspenses", () => {
-    const effect1 = spy(),
-      effect2 = spy();
+    const effect1 = spy(() => {
+        dependency();
+      }),
+      effect2 = spy(() => {
+        dependency();
+      });
+
+    const dependency = createSignal(0);
 
     const suspended1 = createSignal(true);
     const suspended2 = createSignal(true);
@@ -161,6 +167,91 @@ describe("suspense", () => {
 
     assertSpyCalls(effect1, 1);
     assertSpyCalls(effect2, 1);
+
+    suspended2.set(true);
+
+    assertSpyCalls(effect1, 1);
+    assertSpyCalls(effect2, 1);
+
+    dependency.set(1);
+    tick();
+
+    assertSpyCalls(effect1, 2);
+    assertSpyCalls(effect2, 1);
+
+    suspended1.set(true);
+
+    assertSpyCalls(effect1, 2);
+    assertSpyCalls(effect2, 1);
+
+    dependency.set(2);
+    tick();
+
+    assertSpyCalls(effect1, 2);
+    assertSpyCalls(effect2, 1);
+  });
+
+  it("should suspend a child suspense created inside a root", () => {
+    const effect1 = spy(() => {
+        dependency();
+      }),
+      effect2 = spy(() => {
+        dependency();
+      });
+
+    const dependency = createSignal(0);
+
+    const suspended1 = createSignal(true);
+    const suspended2 = createSignal(true);
+
+    withSuspense(suspended1, () => {
+      createEffect(effect1);
+
+      createRoot(() => {
+        withSuspense(suspended2, () => {
+          createEffect(effect2);
+        });
+      });
+    });
+
+    tick();
+
+    assertSpyCalls(effect1, 0);
+    assertSpyCalls(effect2, 0);
+
+    suspended2.set(false);
+    tick();
+
+    assertSpyCalls(effect1, 0);
+    assertSpyCalls(effect2, 0);
+
+    suspended1.set(false);
+    tick();
+
+    assertSpyCalls(effect1, 1);
+    assertSpyCalls(effect2, 1);
+
+    suspended2.set(true);
+
+    assertSpyCalls(effect1, 1);
+    assertSpyCalls(effect2, 1);
+
+    dependency.set(1);
+    tick();
+
+    assertSpyCalls(effect1, 2);
+    assertSpyCalls(effect2, 1);
+
+    suspended1.set(true);
+
+    assertSpyCalls(effect1, 2);
+    assertSpyCalls(effect2, 1);
+
+    dependency.set(2);
+    tick();
+
+    assertSpyCalls(effect1, 2);
+    assertSpyCalls(effect2, 1);
   });
 
   it("should stop a sync effect", () => {
@@ -188,6 +279,45 @@ describe("suspense", () => {
     withSuspense(suspended, () => {
       createEffect(effect, undefined, {
         sync: true,
+      });
+    });
+
+    assertSpyCalls(effect, 0);
+
+    suspended.set(false);
+    assertSpyCalls(effect, 1);
+
+    suspended.set(true);
+    dependency.set(1);
+    suspended.set(false);
+    assertSpyCalls(effect, 2);
+  });
+
+  it("should stop an `init` effect", () => {
+    const effect = spy();
+
+    const suspended = createSignal(true);
+
+    withSuspense(suspended, () => {
+      createEffect(effect, undefined, {
+        sync: "init",
+      });
+    });
+
+    assertSpyCalls(effect, 0);
+  });
+
+  it("should immediately update a sync effect", () => {
+    const effect = spy(() => {
+      dependency();
+    });
+
+    const suspended = createSignal(true);
+    const dependency = createSignal(0);
+
+    withSuspense(suspended, () => {
+      createEffect(effect, undefined, {
+        sync: "init",
       });
     });
 
