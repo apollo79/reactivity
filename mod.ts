@@ -18,6 +18,8 @@ export type {
   Accessor,
   EffectFunction,
   EffectOptions,
+  ReadonlySignal,
+  RootFunction,
   Signal,
   SignalOptions,
 } from "~/types.ts";

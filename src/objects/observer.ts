@@ -66,7 +66,7 @@ export abstract class Observer<T> extends Owner {
   updateIfNecessary() {
     // If there was a change down the tree
     if (this.state === STATE_CHECK) {
-      // Check if one of the direct dependencies is dirty
+      // Check if one of the direct memo dependencies is dirty
       for (const source of this.sources) {
         source.parent?.updateIfNecessary();
 

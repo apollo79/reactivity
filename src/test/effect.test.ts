@@ -267,21 +267,15 @@ describe("effect", () => {
     const $value = createSignal(0);
 
     let x = 0;
-    createEffect(
-      () => {
-        x++;
-        values.push($value());
-        for (let i = 0; i < loop; i++) {
-          createEffect(
-            () => {
-              values.push($value() + i);
-            },
-            // { id: `inner-effect-${x}-${i}` },
-          );
-        }
-      },
-      //   { id: "root-effect" },
-    );
+    createEffect(() => {
+      x++;
+      values.push($value());
+      for (let i = 0; i < loop; i++) {
+        createEffect(() => {
+          values.push($value() + i);
+        });
+      }
+    });
 
     tick();
     assertStrictEquals(values.length, 3);
@@ -445,21 +439,19 @@ describe("effect", () => {
       const $a = createSignal(0);
       const $b = createSignal(0);
 
-      createEffect(
-        () => {
-          outerEffect($a());
+      createEffect(() => {
+        outerEffect($a());
 
-          createEffect(
-            () => {
-              innerEffect($b());
-            },
-            undefined,
-            {
-              sync: true,
-            },
-          );
-        },
-      );
+        createEffect(
+          () => {
+            innerEffect($b());
+          },
+          undefined,
+          {
+            sync: true,
+          },
+        );
+      });
 
       assertSpyCalls(outerEffect, 0);
       assertSpyCalls(innerEffect, 0);

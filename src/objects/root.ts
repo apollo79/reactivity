@@ -14,13 +14,12 @@ import type { Contexts, RootFunction } from "~/types.ts";
  * Anyway it needs to know about its parent for getting context from it
  */
 export class Root<T = unknown> extends Owner {
-  fn: RootFunction<T>;
   context: Contexts = this.parentScope?.context || EMPTY_CONTEXT;
 
-  constructor(fn: RootFunction<T>) {
+  constructor() {
     super();
-    this.fn = fn;
 
+    // Since we only need the root registered for suspenses we only do it if there is a suspense boundary up the tree
     if (this.get(SUSPENSE_SYMBOL)) {
       this.parentScope?.roots.add(this);
     }
@@ -35,9 +34,9 @@ export class Root<T = unknown> extends Owner {
   /**
    * Executes the provided callback with the root as scope
    */
-  runWith(): T {
+  runWith<T>(fn: RootFunction<T>): T {
     const result = Owner.runWithOwner(
-      () => this.fn(this.dispose.bind(this)),
+      () => fn(this.dispose.bind(this)),
       this,
       undefined,
     );

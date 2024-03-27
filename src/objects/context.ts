@@ -8,7 +8,15 @@ export class Context extends Owner {
   constructor(contexts: Contexts) {
     super();
 
+    this.parentScope?.childrenScopes.add(this);
+
     this.context = { ...this.parentScope?.context, ...contexts };
+  }
+
+  override dispose() {
+    super.dispose();
+
+    this.parentScope?.childrenScopes.delete(this);
   }
 
   runWith<T>(fn: () => T): T {

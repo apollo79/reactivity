@@ -1,4 +1,14 @@
-import { createEffect, createRoot, onDispose, tick } from "#/mod.ts";
+import {
+  createEffect,
+  createMemo,
+  createRoot,
+  createSignal,
+  onDispose,
+  tick,
+  withContext,
+  withSuspense,
+} from "#/mod.ts";
+import { ReadonlySignal } from "~/types.ts";
 import { assertSpyCalls, describe, it, spy } from "./util.ts";
 
 describe("onDispose", () => {
@@ -50,5 +60,90 @@ describe("onDispose", () => {
       tick();
       assertSpyCalls(dispose, 0);
     });
+  });
+
+  it("should be invoked in an effect on a dependency change", () => {
+    const dispose = spy();
+
+    const dependency = createSignal(0);
+
+    createEffect(() => {
+      dependency();
+
+      onDispose(dispose);
+    });
+
+    tick();
+    assertSpyCalls(dispose, 0);
+
+    dependency.set(1);
+    tick();
+
+    assertSpyCalls(dispose, 1);
+  });
+
+  it("should be invoked in a memo on a dependency change", () => {
+    const dispose = spy();
+
+    const dependency = createSignal(0);
+
+    const memo = createMemo(() => {
+      dependency();
+
+      onDispose(dispose);
+    });
+
+    tick();
+    assertSpyCalls(dispose, 0);
+
+    memo();
+    assertSpyCalls(dispose, 0);
+
+    dependency.set(1);
+    memo();
+    assertSpyCalls(dispose, 1);
+  });
+
+  it("should be invoked in different types of scopes on parent cleanup", () => {
+    const dispose1 = spy();
+    const dispose2 = spy();
+    const dispose3 = spy();
+    const dispose4 = spy();
+
+    let disposeRoot: () => void;
+    let memo: ReadonlySignal<number>;
+    createRoot((dispose) => {
+      disposeRoot = dispose;
+
+      createEffect(() => {
+        onDispose(dispose1);
+      });
+
+      memo = createMemo(() => {
+        onDispose(dispose2);
+
+        return 0;
+      });
+
+      withSuspense(
+        () => false,
+        () => {
+          onDispose(dispose3);
+        },
+      );
+
+      withContext({ id: 0 }, () => {
+        onDispose(dispose4);
+      });
+    });
+
+    tick();
+    memo!();
+    disposeRoot!();
+
+    assertSpyCalls(dispose1, 1);
+    assertSpyCalls(dispose2, 1);
+    assertSpyCalls(dispose3, 1);
+    assertSpyCalls(dispose4, 1);
   });
 });
