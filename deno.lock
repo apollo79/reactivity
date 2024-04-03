@@ -1,5 +1,22 @@
 {
   "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:benchloop": "npm:benchloop@2.1.1"
+    },
+    "npm": {
+      "benchloop@2.1.1": {
+        "integrity": "sha512-YiI1SNKVzP0CvPEQczNWW/nMeMdGFR0PFp/LHPcGve4zJsCTiITFP/t/f5a48W/pLAvXPW9q3qeUs8nquuhwdQ==",
+        "dependencies": {
+          "tiny-colors": "tiny-colors@2.1.2"
+        }
+      },
+      "tiny-colors@2.1.2": {
+        "integrity": "sha512-6peGRBtkYBJpVrQUWOPKrC0ECo6WotUlXxirVTKvihjdgxQETpKtLdCKIb68IHjJYH1AOE7GM7RnxFvkGHsqOg==",
+        "dependencies": {}
+      }
+    }
+  },
   "remote": {
     "https://deno.land/std@0.178.0/fmt/colors.ts": "938c5d44d889fb82eff6c358bea8baa7e85950a16c9f6dae3ec3a7a729164471",
     "https://deno.land/std@0.178.0/testing/_diff.ts": "1a3c044aedf77647d6cac86b798c6417603361b66b54c53331b312caeb447aea",

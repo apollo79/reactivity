@@ -1,2 +1,4 @@
 /test.ts
 /cov_profile/
+/node_modules/
+/dist/
