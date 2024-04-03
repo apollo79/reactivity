@@ -172,7 +172,7 @@ benchmark.group("untrack", () => {
             untrack(o);
           }
         },
-        { sync: true }
+        { sync: true },
       );
     },
   });
@@ -186,7 +186,7 @@ benchmark.group("untrack", () => {
             untrack(ro);
           }
         },
-        { sync: true }
+        { sync: true },
       );
     },
   });
@@ -200,7 +200,7 @@ benchmark.group("untrack", () => {
             untrack(fo);
           }
         },
-        { sync: true }
+        { sync: true },
       );
     },
   });
@@ -214,7 +214,7 @@ benchmark.group("untrack", () => {
             untrack(fn);
           }
         },
-        { sync: true }
+        { sync: true },
       );
     },
   });

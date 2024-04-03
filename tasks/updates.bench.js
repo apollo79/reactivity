@@ -1,6 +1,6 @@
 /* IMPORT */
 
-import { createSignal, createMemo } from "#/dist/mod.js";
+import { createMemo, createSignal } from "#/dist/mod.js";
 
 /* MAIN */
 

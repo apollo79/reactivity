@@ -23,7 +23,7 @@ Deno.bench("creation", () => {
             arr[i]();
           }
         },
-        { sync: true }
+        { sync: true },
       );
     }
 

@@ -1,11 +1,11 @@
 /* IMPORT */
 
 import {
-  createSelector,
-  createMemo,
-  createSignal,
-  createRoot,
   createEffect,
+  createMemo,
+  createRoot,
+  createSelector,
+  createSignal,
 } from "#/dist/mod.js";
 
 /* MAIN */
@@ -55,7 +55,7 @@ Deno.bench("cleanup", () => {
             memo();
             memoVoid();
           },
-          { sync: true }
+          { sync: true },
         );
 
         createEffect(
@@ -65,7 +65,7 @@ Deno.bench("cleanup", () => {
             memo();
             memoVoid();
           },
-          { sync: true }
+          { sync: true },
         );
       });
     }

@@ -1,7 +1,7 @@
 /* IMPORT */
 
 import { assertEquals } from "~/test/util.ts";
-import { createSignal, createRoot, createMemo } from "#/dist/mod.js";
+import { createMemo, createRoot, createSignal } from "#/dist/mod.js";
 
 /* MAIN */
 

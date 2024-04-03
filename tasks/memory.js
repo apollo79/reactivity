@@ -1,6 +1,6 @@
 /* IMPORT */
 
-import { createRoot, createEffect, createSignal } from "#/dist/mod.js";
+import { createEffect, createRoot, createSignal } from "#/dist/mod.js";
 import process from "node:process";
 
 /* MAIN */
@@ -19,7 +19,7 @@ createRoot(() => {
         observables.push(observable);
         observable();
       },
-      { sync: true }
+      { sync: true },
     );
   }
 });
