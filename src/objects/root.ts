@@ -14,12 +14,13 @@ import type { Contexts, RootFunction } from "~/types.ts";
  * Anyway it needs to know about its parent for getting context from it
  */
 export class Root<T = unknown> extends Owner {
-  context: Contexts = this.parentScope?.context || EMPTY_CONTEXT;
+  override context: Contexts = this.parentScope?.context || EMPTY_CONTEXT;
 
   constructor() {
     super();
 
-    // Since we only need the root registered for suspenses we only do it if there is a suspense boundary up the tree
+    // Since we only need the root registered for suspenses (as for other parent scopes the reason to use a root is exactly to not have it linked)
+    // we only do it if there is a suspense boundary up the tree
     if (this.get(SUSPENSE_SYMBOL)) {
       this.parentScope?.roots.add(this);
     }

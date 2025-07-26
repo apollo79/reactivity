@@ -17,7 +17,7 @@ export class Suspense extends Owner {
    */
   public suspended: number;
 
-  context: Contexts = {
+  override context: Contexts = {
     ...this.parentScope?.context,
     [SUSPENSE_SYMBOL]: this,
   };
@@ -54,6 +54,7 @@ export class Suspense extends Owner {
       return;
     }
 
+    // if the suspension has ended, we notify all the children scopes and queue effects that should run now
     notifyChildrenScopes(this, suspended);
   }
 
@@ -79,7 +80,8 @@ function notifyChildrenScopes(scope: Owner, suspended: boolean) {
       ) {
         // If `init` is true it means that this effect should be sync on first run
         if (childScope.init) {
-          // childrenScope.init = false;
+          // TODO: Should this get set to false so that on future suspension and unsuspension it doesn't get executed immediately again?
+          // childScope.init = false;
 
           childScope.update();
         } else {

@@ -17,7 +17,7 @@ export abstract class Observer<T> extends Owner {
   readonly sources = new Set<Observable<any>>();
   readonly fn: ObserverFunction<undefined | T, T>;
   readonly sync?: boolean;
-  context: Contexts = this.parentScope?.context || EMPTY_CONTEXT;
+  override context: Contexts = this.parentScope?.context || EMPTY_CONTEXT;
 
   constructor(fn: ObserverFunction<undefined | T, T>) {
     super();

@@ -3,7 +3,7 @@ import { Contexts } from "~/types.ts";
 import { ERRORTHROWN_SYMBOL } from "~/context.ts";
 
 export class Context extends Owner {
-  context: Contexts;
+  override context: Contexts;
 
   constructor(contexts: Contexts) {
     super();
