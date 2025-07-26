@@ -55,7 +55,7 @@ Deno.bench("cleanup", () => {
             memo();
             memoVoid();
           },
-          { sync: true }
+          { sync: true },
         );
 
         createEffect(
@@ -65,7 +65,7 @@ Deno.bench("cleanup", () => {
             memo();
             memoVoid();
           },
-          { sync: true }
+          { sync: true },
         );
       });
     }
