@@ -1,5 +1,5 @@
 import { batch, createEffect, createSignal } from "#/mod.ts";
-import { assertRejects } from "https://deno.land/std@0.178.0/testing/asserts.ts";
+import { assertRejects } from "./util.ts";
 import { tick } from "../methods/tick.ts";
 import {
   assertInstanceOf,
@@ -183,18 +183,24 @@ describe("batch", () => {
   });
 
   it("should throw the thrown Error in a synchronous function", async () => {
-    await assertRejects(() =>
-      batch(() => {
-        throw new Error("Test Error");
-      }), "Test Error");
+    await assertRejects(
+      () =>
+        batch(() => {
+          throw new Error("Test Error");
+        }),
+      "Test Error",
+    );
   });
 
   it("should throw the thrown Error in an asynchronous function", async () => {
-    await assertRejects(() =>
-      batch(async () => {
-        await Promise.resolve();
+    await assertRejects(
+      () =>
+        batch(async () => {
+          await Promise.resolve();
 
-        throw new Error("Test Error");
-      }), "Test Error");
+          throw new Error("Test Error");
+        }),
+      "Test Error",
+    );
   });
 });
