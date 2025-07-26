@@ -5,7 +5,7 @@ import { createEffect, createMemo, createSignal, tick } from "#/dist/mod.js";
 /* MAIN */
 
 const avoidablePropagation = () => {
-  const head = $(0);
+  const head = createSignal(0);
   const memo1 = createMemo(() => head());
   const memo2 = createMemo(() => Math.min(0, memo1()));
   const memo3 = createMemo(() => memo2() + 1);
@@ -33,13 +33,13 @@ const createComputations1to1 = () => {
 /* RUNNING */
 
 Deno.bench("avoidable propagation", () => {
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 100; i++) {
     avoidablePropagation();
   }
 });
 
 Deno.bench("create computations 1 to 1", () => {
-  for (let i = 0; i < 100_000; i++) {
+  for (let i = 0; i < 1000; i++) {
     createComputations1to1();
   }
 });

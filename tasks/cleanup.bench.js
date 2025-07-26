@@ -15,7 +15,7 @@ const isSelected = createSelector(selected);
 const isSelectedDisposed = createSelector(createMemo(() => {}));
 
 Deno.bench("cleanup", () => {
-  $.root((dispose) => {
+  createRoot((dispose) => {
     console.time("create");
 
     const isSelected2 = createSelector(selected);
@@ -28,7 +28,7 @@ Deno.bench("cleanup", () => {
     const items = [];
 
     for (let i = 0, l = 1000000; i < l; i++) {
-      items.push($());
+      items.push(createSignal());
     }
 
     const disposers = [];
@@ -55,7 +55,7 @@ Deno.bench("cleanup", () => {
             memo();
             memoVoid();
           },
-          { sync: true },
+          { sync: true }
         );
 
         createEffect(
@@ -65,7 +65,7 @@ Deno.bench("cleanup", () => {
             memo();
             memoVoid();
           },
-          { sync: true },
+          { sync: true }
         );
       });
     }
