@@ -8,6 +8,12 @@ import {
 import { Contexts } from "~/types.ts";
 import { Effect } from "~/objects/effect.ts";
 
+/**
+ * Suspense provide a way to stop the execution of the effects under it.
+ * When suspended, effects won't be executed, but they will get marked by their dependencies,
+ * so when unsuspended, they will execute if they would normally have during the supension.
+ * Suspenses also can be nested: When there is at least one suspense being suspended up the tree, effects won't be executed.
+ */
 export class Suspense extends Owner {
   /**
    * A counter that keeps track of the number of suspensions

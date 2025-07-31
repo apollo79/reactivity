@@ -2,6 +2,9 @@ import { Owner } from "~/objects/owner.ts";
 import { Contexts } from "~/types.ts";
 import { ERRORTHROWN_SYMBOL } from "~/context.ts";
 
+/**
+ * Context provides a way of sharing data with every owner under this scope.
+ */
 export class Context extends Owner {
   override context: Contexts;
 

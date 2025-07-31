@@ -2,7 +2,7 @@ import { BATCH, STATE_CLEAN } from "~/context.ts";
 import { Effect } from "~/objects/effect.ts";
 
 /**
- * The scheduler handles the execution of effects
+ * The scheduler handles the execution of effects.
  */
 export abstract class Scheduler {
   #queue: Effect<any>[] = [];
@@ -57,12 +57,12 @@ export abstract class Scheduler {
 }
 
 /**
- * the sync scheduler is for `sync` effects. It gets flushed by an observable after all its observers have been marked
+ * the sync scheduler is for `sync` effects. It gets flushed by an observable after all its observers have been marked.
  */
 export class SyncScheduler extends Scheduler {}
 
 /**
- * The async scheduler allows automatic batching by deferring the execution of effects to the next microtask
+ * The async scheduler allows automatic batching by deferring the execution of effects to the next microtask.
  */
 export class AsyncScheduler extends Scheduler {
   scheduled = false;

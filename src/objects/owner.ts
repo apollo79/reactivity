@@ -20,9 +20,17 @@ import { Suspense } from "~/objects/suspense.ts";
 import { Root } from "~/objects/root.ts";
 
 /**
- * A scope is the abstraction over roots and computations. It provides contexts and can own other scopes
+ * An owner is the most general abstraction of a scope, which is then extended by roots and computations.
+ * It provides contexts and can own other scopes
  */
 export class Owner {
+  /**
+   * Runs a function with a specified owner.
+   * @param fn The function to run with the specified owner
+   * @param owner The owner to run the function under
+   * @param observer The observer to run the function under. Needed for obersvables to subscribe to the observer. If undefined that means that the current owner is not an observer.
+   * @returns The return value of the provided function
+   */
   static runWithOwner<T>(
     fn: () => T,
     owner: typeof CURRENTOWNER,
@@ -105,7 +113,7 @@ export class Owner {
   get(id: typeof ERRORHANDLER_SYMBOL): ErrorFunction | undefined;
 
   /**
-   * Searches for the context registered under the given id. If it is not found it searches recursively up the scope-tree
+   * Searches for the context registered under the given id. If it is not found it searches recursively up the scope-tree.
    * @param id The ID under which the context is registered
    * @returns The context if found, else undefined
    */

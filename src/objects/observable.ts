@@ -14,7 +14,7 @@ import type {
 } from "~/types.ts";
 
 /**
- * An observable can be a dependency of effects / memos
+ * An observable can be a dependency of effects / memos and will cause them to reexecute to change.
  */
 export class Observable<T = unknown> {
   /**

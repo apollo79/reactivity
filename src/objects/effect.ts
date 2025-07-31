@@ -10,7 +10,7 @@ import type { CacheState, EffectOptions, ObserverFunction } from "~/types.ts";
 import { Suspense } from "~/objects/suspense.ts";
 
 /**
- * An effect is executed immediately on creation and every time again when one of its dependencies changes
+ * An effect is executed immediately on creation and every time again when one of its dependencies changes.
  */
 export class Effect<T> extends Observer<T> {
   /** Stores the last return value of the callback */

@@ -25,6 +25,10 @@ export type EqualsFunction<T> = (prev: T, next: T) => boolean;
 export type UpdateFunction<T> = (current: T) => T;
 
 export type ObservableOptions<T> = {
+  /**
+   * When this is `false`, the obersavble will always tell its listeners to reexecute even if the value stays the same.
+   * You can also provide a custom equals function to use your own logic of when the obersavble should tell its listeners to reexecute.
+   */
   equals?: false | EqualsFunction<T>;
 };
 
@@ -50,6 +54,11 @@ export type ObserverFunction<Prev, Next extends Prev = Prev> = (
 
 // EFFECT
 export type EffectOptions = {
+  /**
+   * Normally, effects are executed async, meaning they are executed on the next microtask to avoid overexecution.
+   * When this is `true`, the effect is immediately executed on notification of one of its dependencies.
+   * If this is `"init"`, it will only execute immediately on its first execution.
+   */
   sync?: true | "init";
 };
 export type EffectFunction<Prev, Next extends Prev = Prev> = ObserverFunction<
@@ -72,7 +81,12 @@ export type OnEffectFunction<S, Prev, Next extends Prev = Prev> = (
   prev: Prev,
 ) => Next;
 
-export type OnOptions = { defer: boolean };
+export type OnOptions = {
+  /**
+   * If this is true, the computation will not run on initialization.
+   */
+  defer: boolean;
+};
 
 // BATCH
 export type BatchFunction<T> = () => T | Promise<T>;

@@ -4,7 +4,8 @@ import { Observable } from "~/objects/observable.ts";
 import type { CacheState, MemoOptions, ObserverFunction } from "~/types.ts";
 
 /**
- * A memo is a computation that stores the last return value of its execution as observable so it can be depended on
+ * A memo is a computation that stores the last return value of its execution as observable so it can be depended on.
+ * It's also not executed eagerly, but only if it has been notified by one of its dependencies before and gets read.
  */
 export class Memo<T> extends Observer<T> {
   currentValue: Observable<T>;
